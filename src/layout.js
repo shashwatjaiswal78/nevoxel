@@ -10,18 +10,10 @@ const { site, nav } = require('./content/site');
 const { esc, attr } = require('./util');
 
 /* ------------------------------------------------------------------ favicon */
-// Inline SVG favicon — the buoy mark in the Harbour palette: navy tile, one
-// signal-orange mark, white waterline. No binary asset, no extra request.
-const FAVICON =
-  'data:image/svg+xml,' +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-      <rect width="32" height="32" rx="6" fill="#0B1F3A"/>
-      <path d="M16 5.5 20.5 16H11.5z" fill="#E8541F"/>
-      <circle cx="16" cy="21.5" r="2.4" fill="#E8541F"/>
-      <path d="M6 26.5h20" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
-    </svg>`.replace(/\s+/g, ' ')
-  );
+// Cropped from the real Nevoxel mark (Brand Guidelines/Nevoxel Logo.png) —
+// icon only, tight-cropped and padded to a square. See
+// src/assets/img/logo/nevoxel-icon.png for the full-resolution master.
+const FAVICON_BASE = '/assets/favicon';
 
 /* ------------------------------------------------------------------- header */
 
@@ -75,18 +67,8 @@ function header(currentPath) {
   return `<a class="skip" href="#main">Skip to content</a>
 <header class="masthead" data-masthead>
   <div class="masthead__inner wrap">
-    <a class="brand" href="/" aria-label="Nevoxel — home">
-      <span class="brand__mark" aria-hidden="true">
-        <svg viewBox="0 0 28 28" fill="none">
-          <path d="M14 4 19 15H9z" fill="var(--signal-600)"/>
-          <circle cx="14" cy="20" r="2.2" fill="var(--signal-600)"/>
-          <path d="M4 24.5h20" stroke="var(--brand-rule)" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </span>
-      <span class="brand__text">
-        <span class="brand__name">Nevoxel</span>
-        <span class="brand__tag">Steering Maritime Talent</span>
-      </span>
+    <a class="brand" href="/" aria-label="Nevoxel — Steering Maritime Talent — home">
+      <img class="brand__logo" src="/assets/img/logo/nevoxel-logo.png" alt="Nevoxel — Steering Maritime Talent" width="960" height="230">
     </a>
 
     <nav class="nav" aria-label="Main">
@@ -146,17 +128,7 @@ function footer() {
   <div class="wrap footer__grid">
     <div class="footer__brand">
       <a class="brand brand--footer" href="/">
-        <span class="brand__mark" aria-hidden="true">
-          <svg viewBox="0 0 28 28" fill="none">
-            <path d="M14 4 19 15H9z" fill="var(--signal-600)"/>
-            <circle cx="14" cy="20" r="2.2" fill="var(--signal-600)"/>
-            <path d="M4 24.5h20" stroke="var(--brand-rule)" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </span>
-        <span class="brand__text">
-          <span class="brand__name">Nevoxel</span>
-          <span class="brand__tag">Steering Maritime Talent</span>
-        </span>
+        <img class="brand__logo" src="/assets/img/logo/nevoxel-logo-white.png" alt="Nevoxel — Steering Maritime Talent" width="960" height="230">
       </a>
       <p class="footer__blurb">Shore-based maritime recruitment since 2008. We move proven maritime, logistics and energy professionals from <em>sea</em> to shore — and stay with them through the first year.</p>
       <ul class="footer__social">
@@ -229,6 +201,7 @@ function organisationSchema() {
     '@type': 'Organization',
     name: site.name,
     url: site.origin,
+    logo: `${site.origin}/assets/img/logo/nevoxel-logo.png`,
     slogan: site.tagline,
     description: site.description,
     foundingDate: String(site.since),
@@ -299,7 +272,9 @@ function page(o) {
   <meta name="twitter:description" content="${attr(o.description)}">
   <meta name="theme-color" content="#0B1F3A">
 
-  <link rel="icon" href="${FAVICON}">
+  <link rel="icon" type="image/png" sizes="32x32" href="${FAVICON_BASE}/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="${FAVICON_BASE}/favicon-48.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="${FAVICON_BASE}/apple-touch-icon.png">
   <!-- Harbour's three families are self-hosted via @font-face in site.css —
        no external font host. Display and body are preloaded; the mono cut is
        only used for eyebrows and can arrive late. -->
