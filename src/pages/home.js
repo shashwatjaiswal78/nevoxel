@@ -4,59 +4,6 @@ const { site } = require('../content/site');
 const { jobs } = require('../content/jobs');
 const { posts } = require('../content/insights');
 
-/**
- * The passage plan — the hero's thesis.
- *
- * A plotted course from a sea waypoint to a shore waypoint, drawn in chart
- * magenta over depth contours. This is the brand argument (sea -> shore) as a
- * picture rather than a slogan, and it replaces the stock container-ship photo
- * every competitor uses.
- */
-function passagePlan() {
-  return `<div class="passage" data-passage>
-  <svg class="passage__svg" viewBox="0 0 460 460" role="img"
-       aria-label="A nautical passage plan: a plotted course running from a waypoint at sea, through the Sea2Shore transition, to a waypoint ashore on the coast.">
-    <!-- land: a headland in the upper right. Fill and coastline are separate
-         paths so only the coast itself carries a stroke, never the closing
-         edges along the frame. -->
-    <path class="passage__land"
-          d="M240,0 C268,70 310,120 370,160 C405,183 430,196 460,206 L460,0 Z"/>
-    <path class="passage__coast"
-          d="M240,0 C268,70 310,120 370,160 C405,183 430,196 460,206"/>
-
-    <!-- depth contours, stepping seaward from the coast -->
-    <path class="passage__contour" d="M196,0 C226,78 270,132 334,176 C372,201 424,218 460,228"/>
-    <path class="passage__contour" d="M150,0 C182,86 228,144 296,192 C338,220 412,244 460,254"/>
-    <path class="passage__contour" d="M100,0 C134,96 184,158 256,210 C302,242 396,272 460,284"/>
-
-    <!-- plotted course: at sea -> transition -> ashore -->
-    <path class="passage__course" d="M64,404 C118,368 156,330 208,286 C266,236 330,182 368,140"/>
-
-    <!-- waypoints -->
-    <rect class="passage__waypoint" x="57" y="397" width="14" height="14" transform="rotate(45 64 404)"/>
-    <circle class="passage__waypoint" cx="208" cy="286" r="6.5"/>
-    <circle class="passage__waypoint passage__waypoint--shore" cx="368" cy="140" r="8"/>
-
-    <!-- vessel, under way on the course -->
-    <path class="passage__vessel" d="M208,272 L215,288 L201,288 Z" transform="rotate(44 208 282)"/>
-
-    <!-- labels sit clear of the track: the mid-course one is offset to the
-         right so the dashed line never runs through it -->
-    <text class="passage__label" x="64" y="436" text-anchor="middle">At sea</text>
-    <text class="passage__label" x="248" y="312" text-anchor="start">Sea2Shore</text>
-    <text class="passage__label passage__label--shore" x="368" y="114" text-anchor="middle">Ashore</text>
-
-    <!-- compass rose, sited in open water clear of the track -->
-    <g transform="translate(392, 386)">
-      <circle class="passage__rose" r="26"/>
-      <circle class="passage__rose" r="16"/>
-      <path class="passage__rose-n" d="M0,-30 L4.5,-16 L-4.5,-16 Z"/>
-      <path class="passage__rose" d="M0,30 L0,16 M-30,0 L-16,0 M30,0 L16,0"/>
-    </g>
-  </svg>
-</div>`;
-}
-
 module.exports = {
   url: '/',
   priority: '1.0',
@@ -67,6 +14,7 @@ module.exports = {
 
     /* ---------------------------------------------------------------- hero */
     const hero = `<section class="hero hero--home">
+  <img class="hero__bg" src="/assets/img/hero/vessel.jpg" alt="A Nevoxel-crewed vessel under way at sea" width="1400" height="788" loading="eager" fetchpriority="high">
   <div class="wrap hero__inner">
     <div class="hero__text">
       <h1 class="hero__title" data-motion="rise">Steering<br>maritime talent<br><em>from sea</em> to shore</h1>
@@ -83,7 +31,6 @@ module.exports = {
       ])}
       <p class="hero__since">Mumbai · Delhi/Noida · Lucknow</p>
     </div>
-    <div class="hero__aside">${passagePlan()}</div>
   </div>
 </section>`;
 

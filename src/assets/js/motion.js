@@ -77,7 +77,6 @@
 
     revealHero();
     scan();
-    heroSequence();
   }
 
   /**
@@ -100,35 +99,6 @@
       el.style.setProperty('--motion-delay', i * 110 + 'ms');
       requestAnimationFrame(function () {
         reveal(el);
-      });
-    });
-  }
-
-  /* ------------------------------------------------- hero page-load sequence */
-  /**
-   * The one orchestrated moment on the site: the passage plan draws its course
-   * from the sea waypoint to the shore waypoint, waypoints landing in order.
-   */
-  function heroSequence() {
-    var passage = document.querySelector('[data-passage]');
-    if (!passage) return;
-
-    if (reduced.matches) {
-      passage.classList.add('is-ready');
-      return;
-    }
-
-    var marks = passage.querySelectorAll(
-      '.passage__waypoint, .passage__vessel, .passage__label'
-    );
-    Array.prototype.forEach.call(marks, function (mark, i) {
-      mark.style.setProperty('--motion-delay', 320 + i * 150 + 'ms');
-    });
-
-    // Wait a frame so the animation starts from a painted state.
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        passage.classList.add('is-ready');
       });
     });
   }

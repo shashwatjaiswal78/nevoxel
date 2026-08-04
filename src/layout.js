@@ -286,7 +286,6 @@ function page(o) {
        Without this, a no-JS visitor would get a page of invisible content. -->
   <noscript><style>
     [data-motion],[data-motion]>*{opacity:1!important;transform:none!important}
-    .passage__waypoint,.passage__vessel,.passage__label{opacity:1!important}
     .quotes__slide{display:none}
     .quotes__slide:first-child{display:block;opacity:1;visibility:visible;transform:none}
     .quotes__controls{display:none!important}

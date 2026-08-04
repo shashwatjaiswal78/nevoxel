@@ -1079,10 +1079,21 @@ em {
 }
 
 .hero--home {
-  padding-block: clamp(var(--s6), 8vh, var(--s7));
-  min-height: min(84vh, 760px);
+  aspect-ratio: 16 / 9;
+  min-height: 460px;
+  max-height: 900px;
   display: flex;
   align-items: center;
+  padding-block: clamp(var(--s6), 6vh, var(--s7));
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
 }
 
 .hero--home::after {
@@ -1105,16 +1116,17 @@ em {
 }
 
 .hero--home .hero__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: var(--s6);
-  align-items: center;
+  display: block;
+}
+
+.hero--home .hero__text {
+  max-width: 640px;
 }
 
 @media (max-width: 940px) {
-  .hero--home .hero__inner {
-    grid-template-columns: 1fr;
-    gap: var(--s5);
+  .hero--home {
+    aspect-ratio: auto;
+    min-height: 560px;
   }
 }
 
@@ -1161,97 +1173,6 @@ em {
   height: 1px;
   background: var(--sea-line);
   flex: none;
-}
-
-/* ---- the passage-plan artwork ----------------------------------------
-   Harbour's hero A calls for a photograph of a real vessel in this slot.
-   Until one exists, the passage plan holds it — redrawn as plain white
-   line work at a single 1.5px weight, with the landfall waypoint as the
-   one signal mark. No fills, no glows.
-   --------------------------------------------------------------------- */
-
-.passage {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  max-width: 520px;
-  margin-inline: auto;
-}
-
-.passage__svg {
-  width: 100%;
-  height: 100%;
-}
-
-.passage__contour {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.18);
-  stroke-width: 1.5;
-}
-
-.passage__land {
-  fill: rgba(255, 255, 255, 0.06);
-  stroke: none;
-}
-
-.passage__coast {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.45);
-  stroke-width: 1.5;
-}
-
-.passage__course {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.75);
-  stroke-width: 1.5;
-  stroke-dasharray: 7 6;
-  stroke-linecap: square;
-}
-
-.passage__waypoint {
-  fill: var(--navy-900);
-  stroke: rgba(255, 255, 255, 0.75);
-  stroke-width: 1.5;
-}
-
-/* Landfall — the destination, and the only orange in the drawing. */
-.passage__waypoint--shore {
-  fill: var(--signal-600);
-  stroke: var(--signal-600);
-  stroke-width: 1.5;
-}
-
-.passage__vessel {
-  fill: #ffffff;
-}
-
-.passage__label {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  fill: var(--sea-fg-50);
-  font-style: normal !important;
-}
-
-.passage__label--shore {
-  fill: var(--signal-400);
-}
-
-.passage__rose {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.28);
-  stroke-width: 1.5;
-}
-
-.passage__rose-n {
-  fill: rgba(255, 255, 255, 0.75);
-}
-
-@media (max-width: 940px) {
-  .passage {
-    max-width: 380px;
-  }
 }
 
 /* ---- interior page hero ---------------------------------------------- */
@@ -3701,54 +3622,6 @@ em {
     transform: none;
   }
 
-  /* Hero course line draws itself once, on load. */
-  .passage__course {
-    stroke-dasharray: 7 6;
-    stroke-dashoffset: 0;
-  }
-
-  .passage.is-ready .passage__course {
-    animation: course-draw 900ms var(--ease) forwards;
-  }
-
-  .passage__waypoint,
-  .passage__vessel,
-  .passage__label {
-    opacity: 0;
-  }
-
-  .passage.is-ready .passage__waypoint,
-  .passage.is-ready .passage__vessel,
-  .passage.is-ready .passage__label {
-    animation: waypoint-in 400ms var(--ease) forwards;
-    animation-delay: var(--motion-delay, 0ms);
-  }
-}
-
-@keyframes course-draw {
-  from {
-    stroke-dashoffset: 620;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes waypoint-in {
-  from {
-    opacity: 0;
-    transform: scale(0.85);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.passage__waypoint,
-.passage__vessel {
-  transform-box: fill-box;
-  transform-origin: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
