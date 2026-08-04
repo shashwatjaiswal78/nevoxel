@@ -1,0 +1,19 @@
+{
+  "name": "nevoxel-website",
+  "version": "1.0.0",
+  "description": "Nevoxel — Steering Maritime Talent. Shore-based maritime recruitment since 2008.",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch",
+    "serve": "node build.js && node serve.js",
+    "start": "node serve.js"
+  },
+  "keywords": [
+    "maritime",
+    "recruitment",
+    "shore-based",
+    "static-site"
+  ],
+  "license": "UNLICENSED"
+}
