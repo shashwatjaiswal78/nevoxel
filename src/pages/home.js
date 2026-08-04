@@ -40,10 +40,11 @@ function passagePlan() {
     <!-- vessel, under way on the course -->
     <path class="passage__vessel" d="M208,272 L215,288 L201,288 Z" transform="rotate(44 208 282)"/>
 
-    <!-- labels: chart convention puts water features in italic, land in roman -->
-    <text class="passage__label" x="64" y="434" text-anchor="middle" font-style="italic">At sea</text>
-    <text class="passage__label" x="208" y="316" text-anchor="middle" font-style="italic">Sea2Shore</text>
-    <text class="passage__label passage__label--shore" x="368" y="118" text-anchor="middle">Ashore</text>
+    <!-- labels sit clear of the track: the mid-course one is offset to the
+         right so the dashed line never runs through it -->
+    <text class="passage__label" x="64" y="436" text-anchor="middle">At sea</text>
+    <text class="passage__label" x="248" y="312" text-anchor="start">Sea2Shore</text>
+    <text class="passage__label passage__label--shore" x="368" y="114" text-anchor="middle">Ashore</text>
 
     <!-- compass rose, sited in open water clear of the track -->
     <g transform="translate(392, 386)">
@@ -66,7 +67,6 @@ module.exports = {
 
     /* ---------------------------------------------------------------- hero */
     const hero = `<section class="hero hero--home">
-  <div class="hero__chart" aria-hidden="true">${C.soundingField(30, 11)}</div>
   <div class="wrap hero__inner">
     <div class="hero__text">
       <h1 class="hero__title" data-motion="rise">Steering<br>maritime talent<br><em>from sea</em> to shore</h1>
@@ -76,8 +76,10 @@ module.exports = {
         first year, which is where these moves actually succeed or fail.
       </p>
       ${C.btnRow([
-        C.btn('Find jobs', '/jobs', { variant: 'solid', icon: true }),
-        C.btn('Hire talent', '/contact?for=employer', { variant: 'outline', icon: true }),
+        // The two doors on navy: white inverse for the seafarer, orange for
+        // the employer, in the fixed order.
+        C.btn('Find jobs', '/jobs', { variant: 'inverse', size: 'lg', icon: true }),
+        C.btn('Hire talent', '/contact?for=employer', { variant: 'solid', size: 'lg', icon: true }),
       ])}
       <p class="hero__since">Mumbai · Delhi/Noida · Lucknow</p>
     </div>

@@ -48,54 +48,57 @@ sitemap and nav follow automatically. Duplicate URLs throw at build time.
 
 ## Design
 
-The visual system is the **Admiralty nautical chart** — chosen because it belongs to the
-client's world rather than to recruitment-site convention (navy + container-ship stock
-photo + wave dividers).
+The visual system is **Harbour v1.0**, the Nevoxel design system
+(`Brand Guidelines/Marine recruitment design system-handoff.zip`). It is built to read as
+an operating maritime business rather than a software product. Four rules drive it:
 
-- **Deep water → shallows → land.** The page descends from sea to shore as you scroll.
-  That's the brand thesis as structure, not a slogan. `band({ coast: true })` draws the
-  depth-contour boundary — now a navy-to-white transition, which reads the concept even
-  more literally than the original cream.
-- **Palette — derived from the Nevoxel logo:** white `#ffffff` · navy `#003c5f` · ocean
-  `#0090d0` · yellow `#ffd000` · magenta `#de3163` (buttons use `#d02a59`, a near-invisible
-  shift that clears WCAG AA as white-on-magenta — the exact logo value sat at 4.44:1,
-  just under the 4.5:1 line for 18px bold text). White is the dominant surface, alternating
-  with a whisper tint (`#f1f6fa`) so sections separate without hard borders. Navy is both
-  the "sea" dark-section colour and the body ink (11.6:1 on white). Ocean is kept as a UI
-  accent only — focus rings, links, hover — because it fails as small text on white
-  (3.56:1); the darkened `--ocean-ink` (`#0072a8`, 5.29:1) carries links instead. Yellow
-  never sits as text on a light surface (1.47:1) — it appears only on navy or as a filled
-  chip with navy text (both ≈7.9:1): the award badge, and the shore waypoint in the hero,
-  which is deliberately the one "landfall beacon" moment on the page.
-  All colour tokens live in `:root` in `site.css`, still under their original chart-era
-  names (`--deep`, `--paper`, `--tide`, etc.) with a legend comment mapping each to its
-  brand role — swapping the palette again means editing values there, not renaming
-  anything through the component rules.
-- **Italic = water, roman = land.** Charts label water features in italic and land
-  features in roman. The site follows that rule, which is why "*from sea* to shore" is
-  set the way it is.
-- **Depth soundings** — the scattered numbers over dark sections — are generated
-  deterministically, so builds are reproducible.
-- **Type:** **Cooper Hewitt** throughout (Chester Jenkins, SIL OFL), self-hosted as woff
-  in `src/assets/fonts/` — no external font host, no Google Fonts request. It's the one
-  family for the whole site; the legacy `--display` / `--body` / `--mono` token names all
-  resolve to it. **Heavy (900)** carries the display headings and **Thin (100)** the large
-  pull-quotes, so the named pairing reads as a deliberate contrast. Book (400), Medium
-  (500), Semibold (600) and Bold (700) fill the scale; Book Italic keeps the sea→shore
-  `<em>` a true italic.
+1. **Structure over effect.** Rules, borders and grids do the work. No gradient meshes,
+   glows, glass panels or animated blobs — those read as tech.
+2. **One orange, one job.** Signal orange marks action and nothing else: never body text,
+   never headings, never decoration, never a fill larger than a button.
+3. **Two doors, always.** Find Jobs (navy) and Hire Talent (orange) appear as a fixed
+   pair, in that order — header, hero, mobile drawer, and the closing CTA of every page.
+4. **Evidence, not adjectives.** Years, places, clients and credentials carry the
+   experience claim, so they are set plainly and ruled rather than dramatised.
 
-  The type scale lives in `:root` as `--fs-*` / `--lh-*` / `--fw-*` tokens (h1 48 · h2 45 ·
-  h3 26 · h4 20 · body 14 · link 16 · button 18). Per the supplied spec, **no uppercase and
-  no letter-spacing anywhere** — the old chart-style labels now read as labels through
-  weight and size, not caps. Two deliberate deviations from the literal spec, both
-  discussed and agreed: long-form article and prose copy stays 16–17px (14px was too tight
-  for reading), and buttons take their height from a 54px `min-height` rather than a
-  fixed 56px line-height, so padded and icon buttons stay aligned.
+- **Palette.** Navy scale `#071426 / #0b1f3a / #173352 / #33455a` for structure and ink;
+  slate `#465666 / #5a6876 / #77848f / #a9b3bc` for body and muted text; signal orange
+  `#fdede7 / #ff7a47 / #e8541f / #b33f13` for action only; page white, mist `#f4f6f8`,
+  border `#e2e6ea` / `#c8d0d8`, success `#1f7a5c`. The target proportion on any full page
+  is **white/mist 60% · navy 33% · orange 7%** — if orange is doing more than that, it has
+  been spent on something that is not an action.
 
-  To change the whole system, edit the `:root` type tokens and the `@font-face` block at
-  the top of `site.css`. To swap the family, replace the fonts in `src/assets/fonts/`,
-  update the `@font-face` `src` URLs and the two `<link rel="preload">` tags in
-  `layout.js`, and repoint `--font-primary`.
+  Tokens live in `:root` in `site.css`: the raw scales first, then semantic aliases
+  (`--paper`, `--ink`, `--sea-fg`, …) that the component rules address. Restating a
+  surface means editing a value there, not renaming anything downstream.
+- **Type — three families, three jobs.** All three are SIL OFL and self-hosted as variable
+  woff2 in `src/assets/fonts/`; no external font host, no Google Fonts request at runtime.
+  - **Plus Jakarta Sans** — display and headings, 700/800 only, negative tracking. Never
+    body copy.
+  - **Onest** — body, leads, UI, forms, labels, buttons. 400/500/600.
+  - **JetBrains Mono** — eyebrows, reference numbers and dates. 11px, `0.14em`, uppercase.
+
+  The scale lives in `:root` as `--fs-*` / `--lh-*` / `--fw-*` / `--tracking-*` tokens:
+  display-xl 56 · display-l 42 · heading-l 30 · heading-m 20 · body-l 17 · body-m 15 ·
+  body-s 13 · eyebrow 11. Buttons are 14/600 with heights SM 40 · MD 48 · LG 56.
+
+  To swap a family, replace the woff2 in `src/assets/fonts/`, update the `@font-face`
+  `src` URLs and the `<link rel="preload">` tags in `layout.js`, and repoint `--display`,
+  `--body` or `--mono`.
+- **Shape and elevation.** Radius 4 inputs · 6 tags · 8 cards · 12 media and hero · full
+  rounding for buttons and filter chips only. Elevation is restrained: border first, then
+  `--shadow-sm` on cards, `--shadow-md` on hover and dropdowns, `--shadow-lg` on the
+  cookie bar. Motion is 160ms for hovers and 240ms for panels; no parallax, no
+  scroll-jacking.
+- **Section rhythm.** 96px desktop, 56px mobile, on a 1240px container.
+  `band({ coast: true })` marks a section that follows a navy one and simply adds a little
+  head-room — Harbour draws no divider between sections, because the change of surface
+  *is* the break.
+- **Imagery.** Harbour's hero pattern A calls for a photograph of a real working vessel
+  behind a left-to-right navy scrim (`#071426` at 94% → 22%). Until that photography
+  exists the home hero holds the slot with the passage-plan drawing, redrawn as plain
+  white line work with the landfall waypoint as the one signal mark. Team portraits are
+  4:5, neutral wall, eye-level, consistent crop across the whole team.
 
 ### CSS convention
 
@@ -105,14 +108,14 @@ over the gap between sections.
 
 ## Accessibility
 
-WCAG 2.1 AA. Verified: all 21 foreground/background pairs across the current brand
-palette meet AA — including the deliberate exclusion of yellow and raw ocean blue from
-any small-text role, and a magenta-lift tuned to 4.78:1 on navy (its logo-nearest value
-sat at 4.43:1, just under the line). Single `<h1>` per page across all 36 pages, visible
-focus states (an ocean-blue ring, 3.3–3.6:1 against both navy and white — the WCAG
-non-text threshold), keyboard-operable mega-menus with `aria-expanded`, skip link,
-semantic landmarks, `prefers-reduced-motion` respected, and a `<noscript>` fallback so the
-motion layer can never leave content invisible.
+WCAG 2.1 AA. Body text never sits lighter than slate-500 on white; on navy, headings are
+white at 100% and body at 75–78%. Signal orange appears as small text only at signal-800
+on white or signal-400 on navy — never as light-on-light. Focus is a 2px navy ring on
+every interactive element, **including orange buttons**, flipping to white on navy
+surfaces. Minimum touch target 44px. Single `<h1>` per page across all 36 pages,
+keyboard-operable mega-menus with `aria-expanded`, skip link, semantic landmarks,
+`prefers-reduced-motion` respected, and a `<noscript>` fallback so the motion layer can
+never leave content invisible.
 
 Motion is documented separately in **[MOTION.md](MOTION.md)** — including how to swap in
 [Motion](https://motion.dev) or GSAP without touching page markup.
@@ -159,14 +162,21 @@ Marked in the source and visibly flagged in the UI so it cannot ship by accident
 
 ### 3. Images
 
-There are none, by design — all artwork is generated SVG, which is faster and more
-distinctive than stock photography. Two places expect real assets eventually:
+There are none yet. Harbour asks for real photography of working ships and crew — no
+renders, no CGI globes, no data overlays — so three places are holding slots until that
+exists:
 
-- **Team portraits** render a chart-style monogram card. Add headshots to
+- **Home hero.** Pattern A wants a full-bleed 16:9 vessel photograph, min 2400px wide,
+  alongside at golden hour, no text in frame, behind the navy scrim. The passage-plan
+  drawing holds the slot in the meantime.
+- **Team portraits** render a monogram on flat navy. Shoot at 4:5, neutral wall,
+  eye-level, consistent crop across the whole team, then add headshots to
   `src/assets/img/team/` and swap `member__initials` for an `<img>` in
   `src/pages/about.js`.
-- **Client logos** are set as typographic wordmarks. Reproducing third-party marks needs
-  each company's permission and their artwork — get both before switching to images.
+- **Client logos** are set as typographic wordmarks in the ruled logo wall. Harbour wants
+  single-colour SVGs at slate-400, capped at 120×32px optical size. Reproducing
+  third-party marks needs each company's permission and their artwork — get both before
+  switching to images.
 
 ### 4. Content cadence
 

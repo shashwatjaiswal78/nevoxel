@@ -17,7 +17,9 @@ const { clients, testimonials, sectors, process: hiringProcess } = require('./co
  * @param {string} o.body
  * @param {string} [o.id]
  * @param {'tight'|'normal'|'loose'} [o.size]
- * @param {boolean} [o.coast]  render the depth-contour coastline on the top edge
+ * @param {boolean} [o.coast]  section follows a navy one — adds a little
+ *                             extra head-room. (Harbour draws no divider:
+ *                             the change of surface is the break.)
  * @param {string} [o.tag]     element name, defaults to section
  */
 function band({ tone = 'paper', body, id, size = 'normal', coast = false, tag = 'section', className = '' }) {
@@ -32,22 +34,10 @@ function band({ tone = 'paper', body, id, size = 'normal', coast = false, tag = 
     .join(' ');
 
   return `<${tag} class="${classes}"${id ? ` id="${attr(id)}"` : ''}>
-  ${coast ? coastline() : ''}
   <div class="wrap">
 ${body}
   </div>
 </${tag}>`;
-}
-
-/** Depth-contour divider: the sea/land boundary that carries the brand thesis. */
-function coastline() {
-  return `<div class="coast" aria-hidden="true">
-  <svg class="coast__svg" viewBox="0 0 1440 90" preserveAspectRatio="none">
-    <path class="coast__deep" d="M0,54 C120,30 260,72 420,58 C580,44 700,10 880,26 C1040,40 1180,74 1440,50 L1440,90 L0,90 Z"/>
-    <path class="coast__line" d="M0,54 C120,30 260,72 420,58 C580,44 700,10 880,26 C1040,40 1180,74 1440,50" fill="none"/>
-    <path class="coast__sounding" d="M0,66 C130,44 265,84 425,70 C585,56 705,24 885,40 C1045,54 1185,86 1440,62" fill="none"/>
-  </svg>
-</div>`;
 }
 
 /* ------------------------------------------------------------- typographic */
@@ -289,8 +279,10 @@ function ctaBand({
   primary = { label: 'Hire talent', href: '/contact?for=employer' },
   secondary = { label: 'Find jobs', href: '/jobs' },
 } = {}) {
+  // Harbour's closing CTA is a light panel, and it carries the two doors in
+  // the fixed order: the navy alternative first, the orange action last.
   return band({
-    tone: 'deep',
+    tone: 'paper-alt',
     size: 'tight',
     className: 'band--cta',
     body: `    <div class="cta" data-motion="rise">
@@ -299,8 +291,8 @@ function ctaBand({
         <p class="cta__body">${prose(body)}</p>
       </div>
       <div class="cta__actions">
+        ${btn(secondary.label, secondary.href, { variant: 'navy', icon: true })}
         ${btn(primary.label, primary.href, { variant: 'solid', icon: true })}
-        ${btn(secondary.label, secondary.href, { variant: 'ghost', icon: true })}
       </div>
     </div>`,
   });
@@ -311,7 +303,6 @@ function ctaBand({
 /** Standard interior page hero (the home page has its own). */
 function pageHero({ eyebrow: eb, title, lede, actions = [], coord, aside = '' }) {
   return `<section class="hero hero--page">
-  <div class="hero__chart" aria-hidden="true">${soundingField(18)}</div>
   <div class="wrap hero__inner">
     <div class="hero__text">
       ${eb ? eyebrow(eb, { coord }) : ''}
@@ -322,29 +313,6 @@ function pageHero({ eyebrow: eb, title, lede, actions = [], coord, aside = '' })
     ${aside ? `<div class="hero__aside" data-motion="rise">${aside}</div>` : ''}
   </div>
 </section>`;
-}
-
-/**
- * Depth soundings — the scattered small numbers that cover a real chart.
- * Deterministic so builds are reproducible.
- */
-function soundingField(count = 24, seed = 7) {
-  let s = seed;
-  const rand = () => {
-    s = (s * 1103515245 + 12345) % 2147483648;
-    return s / 2147483648;
-  };
-  const marks = [];
-  for (let i = 0; i < count; i++) {
-    const x = (rand() * 100).toFixed(2);
-    const y = (rand() * 100).toFixed(2);
-    const depth = (rand() * 60 + 4).toFixed(rand() > 0.6 ? 1 : 0);
-    const dim = (0.18 + rand() * 0.3).toFixed(2);
-    marks.push(
-      `<span class="sounding" style="left:${x}%;top:${y}%;opacity:${dim}">${depth}</span>`
-    );
-  }
-  return `<div class="soundings">${marks.join('')}</div>`;
 }
 
 /* --------------------------------------------------------------- articles */
@@ -438,7 +406,6 @@ function routedForm({ id = 'enquiry', defaultSegment = 'candidate', compact = fa
 
 module.exports = {
   band,
-  coastline,
   eyebrow,
   sectionHead,
   btn,
@@ -457,7 +424,6 @@ module.exports = {
   statRow,
   ctaBand,
   pageHero,
-  soundingField,
   articleCard,
   routedForm,
 };

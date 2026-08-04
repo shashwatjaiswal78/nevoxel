@@ -10,16 +10,16 @@ const { site, nav } = require('./content/site');
 const { esc, attr } = require('./util');
 
 /* ------------------------------------------------------------------ favicon */
-// Inline SVG favicon — a chart magenta buoy on deep water. No binary asset,
-// no extra request.
+// Inline SVG favicon — the buoy mark in the Harbour palette: navy tile, one
+// signal-orange mark, white waterline. No binary asset, no extra request.
 const FAVICON =
   'data:image/svg+xml,' +
   encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-      <rect width="32" height="32" rx="7" fill="#003C5F"/>
-      <path d="M16 5.5 20.5 16H11.5z" fill="#FFD000"/>
-      <circle cx="16" cy="21.5" r="2.4" fill="#DE3163"/>
-      <path d="M6 26.5h20" stroke="#0090D0" stroke-width="1.6" stroke-linecap="round"/>
+      <rect width="32" height="32" rx="6" fill="#0B1F3A"/>
+      <path d="M16 5.5 20.5 16H11.5z" fill="#E8541F"/>
+      <circle cx="16" cy="21.5" r="2.4" fill="#E8541F"/>
+      <path d="M6 26.5h20" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
     </svg>`.replace(/\s+/g, ' ')
   );
 
@@ -78,9 +78,9 @@ function header(currentPath) {
     <a class="brand" href="/" aria-label="Nevoxel — home">
       <span class="brand__mark" aria-hidden="true">
         <svg viewBox="0 0 28 28" fill="none">
-          <path d="M14 4 19 15H9z" fill="var(--magenta)"/>
-          <circle cx="14" cy="20" r="2.2" fill="var(--magenta)"/>
-          <path d="M4 24.5h20" stroke="var(--tide)" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M14 4 19 15H9z" fill="var(--signal-600)"/>
+          <circle cx="14" cy="20" r="2.2" fill="var(--signal-600)"/>
+          <path d="M4 24.5h20" stroke="var(--brand-rule)" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </span>
       <span class="brand__text">
@@ -96,7 +96,9 @@ function header(currentPath) {
     </nav>
 
     <div class="masthead__actions">
-      <a class="btn btn--outline btn--sm" href="/jobs">Find jobs</a>
+      <!-- The two doors: navy for the seafarer, orange for the employer,
+           always in this order. -->
+      <a class="btn btn--navy btn--sm" href="/jobs">Find jobs</a>
       <a class="btn btn--solid btn--sm" href="/contact?for=employer">Hire talent</a>
       <button class="burger" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
         <span class="burger__bar"></span>
@@ -128,7 +130,7 @@ function header(currentPath) {
         })
         .join('\n      ')}
       <div class="mobile-nav__cta">
-        <a class="btn btn--outline" href="/jobs">Find jobs</a>
+        <a class="btn btn--inverse" href="/jobs">Find jobs</a>
         <a class="btn btn--solid" href="/contact?for=employer">Hire talent</a>
       </div>
     </div>
@@ -146,9 +148,9 @@ function footer() {
       <a class="brand brand--footer" href="/">
         <span class="brand__mark" aria-hidden="true">
           <svg viewBox="0 0 28 28" fill="none">
-            <path d="M14 4 19 15H9z" fill="var(--magenta)"/>
-            <circle cx="14" cy="20" r="2.2" fill="var(--magenta)"/>
-            <path d="M4 24.5h20" stroke="var(--tide)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M14 4 19 15H9z" fill="var(--signal-600)"/>
+            <circle cx="14" cy="20" r="2.2" fill="var(--signal-600)"/>
+            <path d="M4 24.5h20" stroke="var(--brand-rule)" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </span>
         <span class="brand__text">
@@ -295,12 +297,14 @@ function page(o) {
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${attr(fullTitle)}">
   <meta name="twitter:description" content="${attr(o.description)}">
-  <meta name="theme-color" content="#003C5F">
+  <meta name="theme-color" content="#0B1F3A">
 
   <link rel="icon" href="${FAVICON}">
-  <!-- Cooper Hewitt is self-hosted via @font-face in site.css — no external font host. -->
-  <link rel="preload" href="/assets/fonts/CooperHewitt-Heavy.woff" as="font" type="font/woff" crossorigin>
-  <link rel="preload" href="/assets/fonts/CooperHewitt-Book.woff" as="font" type="font/woff" crossorigin>
+  <!-- Harbour's three families are self-hosted via @font-face in site.css —
+       no external font host. Display and body are preloaded; the mono cut is
+       only used for eyebrows and can arrive late. -->
+  <link rel="preload" href="/assets/fonts/PlusJakartaSans-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Onest-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/site.css">
 
   <!-- The motion layer hides [data-motion] elements until JS reveals them.
