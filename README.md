@@ -249,6 +249,10 @@ events the brief asks for (job search, application, form submit, CTA clicks).
 Build and upload `dist/`. It's plain static files — Netlify, Vercel, Cloudflare Pages, S3
 or ordinary shared hosting all work.
 
+**Vercel** is configured in `vercel.json`: build command `node build.js`, output directory
+`dist`, no install step, and `trailingSlash: true` so live URLs match the canonical and
+sitemap URLs (`/about/team/`). No project settings need changing in the dashboard.
+
 Update `site.origin` in `src/content/site.js` to the production domain **before** the
 final build; canonicals, OG tags and `sitemap.xml` are generated from it.
 
