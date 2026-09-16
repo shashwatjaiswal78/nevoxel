@@ -1,7 +1,7 @@
 # Nevoxel — website
 
-Shore-based maritime recruitment since 2008. A static site built from the brief in
-`nevoxel-website-project.md`.
+Shore-based recruitment since 2008 — three specialist desks: maritime, logistics and legal.
+A static site built from the brief in `nevoxel-website-project.md`.
 
 ```bash
 npm run build     # build once -> dist/
@@ -28,14 +28,17 @@ No dependencies, no install step. Node 18+.
 ```
 src/
   routes.js          every page, in sitemap order — add pages here
-  layout.js          <head>, sticky header, footer, per-page SEO
+  layout.js          <head>, sticky header, footer, per-page SEO, breadcrumbs
   components.js      reusable sections (bands, cards, job cards, forms…)
   util.js            escaping, date and salary formatting
   content/
-    site.js          nav, offices, clients, team, values, testimonials
+    site.js          nav, offices, clients, team, values, testimonials, sectors
+    expertise.js     the practice verticals — maritime, logistics, legal
     jobs.js          job board data
     insights.js      blog, press, events
   pages/             one module per template
+    expertise.js     the three vertical hubs + the /expertise overview
+    policies.js      privacy, terms, 404 — NOT the legal vertical, which is /legal
   assets/            css, js — copied to dist/ verbatim
 dist/                build output — deploy this folder
 ```
@@ -43,8 +46,39 @@ dist/                build output — deploy this folder
 **Editing copy?** Almost everything lives in `src/content/`. You rarely need to touch
 `pages/`.
 
-**Adding a page?** Create it in `src/pages/`, then register it in `src/routes.js`. The
-sitemap and nav follow automatically. Duplicate URLs throw at build time.
+**Adding a page?** Create it in `src/pages/`, then register it in `src/routes.js`, **and**
+add it to the `nav` array in `src/content/site.js` — the nav is a separate list and is not
+derived from the routes. The sitemap follows automatically. Duplicate URLs throw at build
+time.
+
+## The three axes
+
+The site is organised on three axes, and keeping them apart is what stops the IA turning
+into a matrix:
+
+| Axis | Where it lives | Answers |
+|---|---|---|
+| **Audience** | `/candidates`, `/employers`, the two door CTAs | "Which one am I?" |
+| **Service** | `/employers/*` | "How would you run my vacancy?" |
+| **Practice vertical** | `/maritime`, `/logistics`, `/legal` | "Do you know my market?" |
+
+> **Verticals prove expertise. Audiences convert. Services explain method.**
+
+A vertical hub never explains process and never duplicates a service page — that is what
+keeps `/maritime` and `/employers/maritime-recruitment` from competing for the same search
+terms. The hub is the market and the live roles; the service page is the method.
+
+Verticals are cross-cutting on purpose: **executive search is a service, not a sector**, so
+it stays under `/employers` and must not enter the Expertise menu. Energy & Chemicals and
+Engineering & Infrastructure are named on `/expertise` as planned for 2027 but have no hub
+pages, because neither has a track record to put on one.
+
+**One sector per job.** `sector` in `content/jobs.js` names the desk that runs the mandate,
+not the client's industry — a General Counsel role at a shipping company is `sector: 'Legal'`.
+Each hub lists the roles matching its own sector, so a role filed twice appears twice, and a
+role filed wrongly is invisible to its desk. The board's Sector filter is derived from the
+job data, so a new sector value appears in the dropdown with no code change; the editorial
+list in `content/site.js` is separate and allowed to differ.
 
 ## Design
 
@@ -112,7 +146,7 @@ WCAG 2.1 AA. Body text never sits lighter than slate-500 on white; on navy, head
 white at 100% and body at 75–78%. Signal orange appears as small text only at signal-800
 on white or signal-400 on navy — never as light-on-light. Focus is a 2px navy ring on
 every interactive element, **including orange buttons**, flipping to white on navy
-surfaces. Minimum touch target 44px. Single `<h1>` per page across all 36 pages,
+surfaces. Minimum touch target 44px. Single `<h1>` per page across all 44 pages,
 keyboard-operable mega-menus with `aria-expanded`, skip link, semantic landmarks,
 `prefers-reduced-motion` respected, and a `<noscript>` fallback so the motion layer can
 never leave content invisible.
@@ -159,6 +193,25 @@ Marked in the source and visibly flagged in the UI so it cannot ship by accident
 - **Privacy and Terms** — structurally complete drafts covering the DPDP Act 2023, with
   bracketed fields unfilled. **Not legal advice** — have Adv. Surangama Sharma review them.
 - **Phone numbers** — placeholder format. Real numbers weren't in the brief.
+- **Desk rosters** (`src/content/expertise.js`) — the "who runs this desk" band on
+  `/logistics` and `/legal` carries a visible placeholder flag. The legal desk in particular
+  is new: the site records only Adv. Surangama Sharma, and as advisor *to* Nevoxel rather
+  than head of a legal recruitment desk. Add the real advisors, then delete
+  `isPlaceholder: true`. This is the single biggest blocker on shipping `/legal`.
+
+### 2a. What the Legal vertical still needs
+
+The structure is complete; the evidence is not. In Harbour's terms these are adjectives
+waiting to become evidence:
+
+- **Legal clients.** `clients` in `src/content/site.js` is entirely maritime, so
+  `C.trustBar()` is deliberately *not* on `/legal` — a shipping logo wall under a legal
+  headline borrows proof that isn't there. Add legal clients before adding the trust bar.
+- **Legal testimonials.** All three existing quotes are placeholders and none is legal.
+- **Legal mandates.** The five roles on the desk are samples (`src/content/jobs.js`).
+- **Legal insights.** Posts carry a `category` that is the *audience* axis ("For Employers",
+  "Market"), not a sector. There is no way to associate an article with a desk yet. Adding
+  an optional `sector` field to `posts` would let each hub surface its own editorial.
 
 ### 3. Images
 

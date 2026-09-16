@@ -12,12 +12,17 @@ const blog = {
   changefreq: 'weekly',
   render() {
     const [lead, ...rest] = posts;
+    const leadCover = C.postCover(lead);
 
     const hero = C.pageHero({
-      eyebrow: 'Insights',
-      coord: `${posts.length} articles`,
       title: 'Notes from the shore-side market',
       lede: 'What we are seeing on the desk — written for the people it affects, not for search engines.',
+      image: {
+        src: '/assets/img/hero/blog.webp',
+        alt: 'Printed market reports, a notebook and a cup of tea on a working desk',
+        width: 1536,
+        height: 1024,
+      },
     });
 
     const leadBand = C.band({
@@ -25,6 +30,11 @@ const blog = {
       coast: true,
       size: 'tight',
       body: `    <a class="post" href="/insights/blog/${esc(lead.slug)}" data-motion="rise" style="border-top:0">
+      ${
+        leadCover
+          ? `<img class="post__cover post__cover--lead" src="${leadCover.src}" alt="" width="${leadCover.width}" height="${leadCover.height}" loading="lazy" decoding="async">`
+          : ''
+      }
       <p class="post__meta"><span class="post__cat">${esc(lead.category)}</span><span class="post__date">${esc(
         formatDate(lead.date)
       )}</span></p>
@@ -84,10 +94,9 @@ function articlePage(post) {
       const related = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
 
       const hero = C.pageHero({
-        eyebrow: post.category,
-        coord: formatDate(post.date),
         title: post.title,
         lede: post.dek,
+        image: C.postCover(post),
       });
 
       const body = C.band({
@@ -107,7 +116,7 @@ function articlePage(post) {
 
       const more = C.band({
         tone: 'paper-alt',
-        body: `    ${C.sectionHead({ eyebrow: 'Keep reading', title: 'More insights' })}
+        body: `    ${C.sectionHead({ title: 'More insights' })}
     ${C.cardGrid(
       related.map((p) => C.articleCard(p)),
       { cols: 3 }
@@ -145,7 +154,6 @@ const pressPage = {
   priority: '0.6',
   render() {
     const hero = C.pageHero({
-      eyebrow: 'Publications & press',
       title: 'Features, bylines and awards',
       lede: 'Where Nevoxel and our team have appeared in the maritime and business press.',
     });
@@ -193,7 +201,6 @@ const eventsPage = {
   indexable: events.length > 0,
   render() {
     const hero = C.pageHero({
-      eyebrow: 'Interviews & events',
       title: 'Where to find us',
       lede: 'Conference appearances, panels and recorded interviews.',
     });

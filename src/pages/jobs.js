@@ -11,6 +11,21 @@ const { jobs, filters } = require('../content/jobs');
  * experience. This is the whole reason the iframe board had to go: content
  * inside an iframe cannot carry this markup on your own domain.
  */
+/**
+ * schema.org employmentType values, keyed by the `type` field in content/jobs.js.
+ * A lookup rather than a ternary: the legal desk uses interim and contract far
+ * more than the maritime desk does, and the old `Full-time ? FULL_TIME :
+ * CONTRACTOR` fallback silently mis-tagged everything else.
+ */
+const EMPLOYMENT_TYPE = {
+  'Full-time': 'FULL_TIME',
+  'Part-time': 'PART_TIME',
+  Contract: 'CONTRACTOR',
+  Temporary: 'TEMPORARY',
+  Interim: 'TEMPORARY',
+  Internship: 'INTERN',
+};
+
 function jobPostingSchema(job) {
   const data = {
     '@context': 'https://schema.org',
@@ -26,7 +41,7 @@ function jobPostingSchema(job) {
     ].join(''),
     datePosted: job.posted,
     validThrough: job.closes,
-    employmentType: job.type === 'Full-time' ? 'FULL_TIME' : 'CONTRACTOR',
+    employmentType: EMPLOYMENT_TYPE[job.type] || 'OTHER',
     directApply: true,
     hiringOrganization: {
       '@type': 'Organization',
@@ -87,10 +102,14 @@ const board = {
   changefreq: 'daily',
   render() {
     const hero = C.pageHero({
-      eyebrow: 'Job board',
-      coord: `${jobs.length} live roles`,
-      title: 'Shore-based maritime jobs',
-      lede: 'Every role here is a live mandate we are working. Native, filterable and indexed — no iframe, no redirect to somebody else’s board.',
+      title: 'Shore-based jobs across every desk',
+      lede: 'Maritime, logistics and legal mandates, all of them live and all of them ours. Native, filterable and indexed — no iframe, no redirect to somebody else’s board.',
+      image: {
+        src: '/assets/img/hero/jobs.webp',
+        alt: 'Officer and crewing coordinator reviewing documents at a desk in a manning office',
+        width: 1536,
+        height: 1024,
+      },
     });
 
     const boardBand = C.band({
@@ -164,8 +183,8 @@ const board = {
 
     return page({
       url: '/jobs',
-      title: 'Job Board — shore-based maritime jobs',
-      description: `${jobs.length} live shore-based maritime, logistics and energy roles across India. Filter by sector, function, location and seniority.`,
+      title: 'Job Board — shore-based maritime, logistics and legal jobs',
+      description: `${jobs.length} live shore-based roles across India — maritime, logistics and legal. Filter by sector, function, location and seniority.`,
       main: [hero, boardBand, help].join('\n'),
       scripts: ['/assets/js/jobs.js'],
       jsonld: [
@@ -173,7 +192,7 @@ const board = {
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
           name: 'Nevoxel job board',
-          description: 'Live shore-based maritime vacancies.',
+          description: 'Live shore-based vacancies across the maritime, logistics and legal desks.',
           url: `${site.origin}/jobs/`,
         },
       ],
@@ -190,8 +209,6 @@ function jobDetailPage(job) {
     changefreq: 'weekly',
     render() {
       const hero = C.pageHero({
-        eyebrow: `${job.sector} · ${job.func}`,
-        coord: `Posted ${formatDate(job.posted)}`,
         title: job.title,
         lede: job.summary,
       });
@@ -240,6 +257,7 @@ function jobDetailPage(job) {
           <div class="jd__fact"><dt>Function</dt><dd>${esc(job.func)}</dd></div>
           <div class="jd__fact"><dt>Seniority</dt><dd>${esc(job.seniority)}</dd></div>
           <div class="jd__fact"><dt>Type</dt><dd>${esc(job.type)}</dd></div>
+          <div class="jd__fact"><dt>Posted</dt><dd>${esc(formatDate(job.posted))}</dd></div>
           ${
             job.salary
               ? `<div class="jd__fact"><dt>Salary</dt><dd>${esc(salaryLabel(job.salary))}</dd></div>`
@@ -251,7 +269,9 @@ function jobDetailPage(job) {
           variant: 'solid',
           icon: true,
         })}
-        <p class="jd__note">Applications go to the maritime desk. We reply to every application, including the ones we cannot take forward.</p>
+        <p class="jd__note">Applications go to the ${esc(
+          job.sector.toLowerCase()
+        )} desk. We reply to every application, including the ones we cannot take forward.</p>
       </aside>
     </div>`,
       });
@@ -261,7 +281,7 @@ function jobDetailPage(job) {
       const relatedBand = related.length
         ? C.band({
             tone: 'paper-alt',
-            body: `    ${C.sectionHead({ eyebrow: 'Similar roles', title: `More in ${job.func}` })}
+            body: `    ${C.sectionHead({ title: `More in ${job.func}` })}
     <div class="job-list" data-motion="stagger">
       ${related.map((j) => C.jobCard(j, { compact: true })).join('\n      ')}
     </div>

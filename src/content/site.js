@@ -37,6 +37,32 @@ const site = {
 /* --------------------------------------------------------------- navigation */
 
 const nav = [
+  // Expertise leads: it answers "do you know my market?" before the two doors
+  // ask "which one are you?". The doors stay permanently visible as the two
+  // CTA buttons in the masthead, so nothing is lost by putting them second.
+  {
+    label: 'Expertise',
+    url: '/expertise',
+    blurb: 'Specialist desks, not a general agency.',
+    children: [
+      { label: 'Overview', url: '/expertise', note: 'How our desks are organised' },
+      {
+        label: 'Nevoxel Maritime',
+        url: '/maritime',
+        note: 'Shore, technical, commercial, QHSE',
+      },
+      {
+        label: 'Nevoxel Logistics',
+        url: '/logistics',
+        note: 'Freight, 3PL, supply chain, trade',
+      },
+      {
+        label: 'Nevoxel Legal',
+        url: '/legal',
+        note: 'In-house counsel, compliance, contracts',
+      },
+    ],
+  },
   {
     label: 'For Employers',
     url: '/employers',
@@ -133,14 +159,20 @@ const offices = [
 /* ------------------------------------------------------------------ clients */
 // Named in the brief. Rendered as typographic wordmarks, not imitation logos.
 
+/**
+ * `logo` is the rendered size in CSS px, set by eye rather than by one fixed
+ * height: a solid block (MOL) looks far heavier than a thin ring (ATPI) at the
+ * same height, so each mark is sized to carry the same visual weight. Files
+ * live at /assets/img/logos/<slug>.webp — trimmed, transparent, 2–3x these sizes.
+ */
 const clients = [
-  { name: 'Mitsui O.S.K. Lines', short: 'Mitsui O.S.K.' },
-  { name: 'TORM', short: 'TORM' },
-  { name: 'Aditya Birla Group', short: 'Aditya Birla' },
-  { name: 'Scorpio Marine', short: 'Scorpio' },
-  { name: 'Navig8 Group', short: 'Navig8' },
-  { name: 'ATPI', short: 'ATPI' },
-  { name: 'MTM Ship Management', short: 'MTM' },
+  { name: 'Mitsui O.S.K. Lines', short: 'Mitsui O.S.K.', logo: { slug: 'mitsui-osk', w: 95, h: 36 } },
+  { name: 'TORM', short: 'TORM', logo: { slug: 'torm', w: 136, h: 21 } },
+  { name: 'Aditya Birla Group', short: 'Aditya Birla', logo: { slug: 'aditya-birla', w: 78, h: 43 } },
+  { name: 'Scorpio Marine', short: 'Scorpio', logo: { slug: 'scorpio', w: 132, h: 36 } },
+  { name: 'Navig8 Group', short: 'Navig8', logo: { slug: 'navig8', w: 103, h: 38 } },
+  { name: 'ATPI', short: 'ATPI', logo: { slug: 'atpi', w: 58, h: 52 } },
+  { name: 'MTM Ship Management', short: 'MTM', logo: { slug: 'mtm', w: 79, h: 43 } },
 ];
 
 const award = {
@@ -151,13 +183,17 @@ const award = {
 
 /* --------------------------------------------------------------------- team */
 
+/**
+ * `photo: true` renders /assets/img/team/<slug>.webp (4:3, 720×540, face
+ * centred) in the portrait slot; without it the card shows the initials.
+ */
 const team = [
   {
     name: 'Neetu Jaiswal',
     slug: 'neetu-jaiswal',
     role: 'Founder & Chief Executive',
     initials: 'NJ',
-    coords: { lat: '19°13′N', lon: '72°58′E' },
+    photo: true,
     bio: 'Neetu founded Nevoxel in 2008 to fix a gap she kept running into: maritime professionals with deep operational experience, and shore-side employers who could not read a sea CV. She leads the maritime and executive search desks and is a Star Women in Maritime 2022 awardee.',
     focus: ['Executive search', 'Maritime shore recruitment', 'Client strategy'],
   },
@@ -166,7 +202,6 @@ const team = [
     slug: 'rajesh-menon',
     role: 'Advisor & Wellness Coach',
     initials: 'RM',
-    coords: { lat: '19°13′N', lon: '72°58′E' },
     bio: 'Rajesh advises on the human side of the transition ashore — the part that derails placements more often than skills do. He runs the wellness and coaching components of our NECD advisory work and mentors Sea2Shore candidates through their first shore year.',
     focus: ['Wellness advisory', 'Transition coaching', 'Retention'],
   },
@@ -175,9 +210,18 @@ const team = [
     slug: 'surangama-sharma',
     role: 'Legal Advisor',
     initials: 'SS',
-    coords: { lat: '26°51′N', lon: '80°57′E' },
+    photo: true,
     bio: 'Surangama advises Nevoxel and its clients on employment contracts, compliance and the documentation that shore-side maritime hiring runs on, including TMSA-aligned HR practice.',
     focus: ['Employment law', 'Compliance', 'Contracts'],
+  },
+  {
+    name: 'Shashwat Jaiswal',
+    slug: 'shashwat-jaiswal',
+    role: 'Marketing Advisor',
+    initials: 'SJ',
+    photo: true,
+    bio: 'Shashwat advises on how Nevoxel presents itself to the market — the brand, the website and the employer-facing and candidate-facing communication that brings the right briefs and the right people to the desk.',
+    focus: ['Brand', 'Digital marketing', 'Communications'],
   },
 ];
 
@@ -228,15 +272,25 @@ const differentiators = [
 
 /* ------------------------------------------------------------------ sectors */
 
+/**
+ * The entries carrying an `href` are live practice verticals with their own hub
+ * page; the plain strings are adjacent markets we recruit into but do not run a
+ * dedicated desk for. `sectorChips` renders the first kind as links and the
+ * second as plain text, so the distinction is visible without a second component.
+ *
+ * This list is editorial. The job board's Sector filter is a separate, derived
+ * list (`filters.sector` in content/jobs.js) built from the jobs that actually
+ * exist — the two are allowed to differ, and do.
+ */
 const sectors = [
-  'Maritime',
-  'Logistics',
+  { label: 'Maritime', href: '/maritime' },
+  { label: 'Logistics', href: '/logistics' },
+  { label: 'Legal', href: '/legal' },
   'Energy',
   'Manufacturing',
   'BFSI',
   'Pharma',
   'Technology',
-  'IT',
   'Finance',
 ];
 

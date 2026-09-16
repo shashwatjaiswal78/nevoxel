@@ -42,17 +42,8 @@ ${body}
 
 /* ------------------------------------------------------------- typographic */
 
-function eyebrow(text, { coord } = {}) {
-  return `<p class="eyebrow">
-    <span class="eyebrow__tick" aria-hidden="true"></span>
-    <span class="eyebrow__text">${esc(text)}</span>
-    ${coord ? `<span class="eyebrow__coord" aria-hidden="true">${esc(coord)}</span>` : ''}
-  </p>`;
-}
-
-function sectionHead({ eyebrow: eb, title, lede, coord, align = 'left', level = 2 }) {
+function sectionHead({ title, lede, align = 'left', level = 2 }) {
   return `<header class="sec-head sec-head--${align}" data-motion="rise">
-    ${eb ? eyebrow(eb, { coord }) : ''}
     <h${level} class="sec-head__title">${prose(title)}</h${level}>
     ${lede ? `<p class="sec-head__lede">${prose(lede)}</p>` : ''}
   </header>`;
@@ -74,9 +65,20 @@ function btnRow(buttons, { align = 'left' } = {}) {
 
 /* ------------------------------------------------------------------- cards */
 
-function card({ title, body, href, meta, index, tone = '' }) {
+/**
+ * `image` ({ src, width, height }) puts a 3:2 photo edge to edge across the top
+ * of the card. It is decorative (alt=""): the card title carries the meaning,
+ * and a screen reader would otherwise hear the same thing twice.
+ */
+function card({ title, body, href, meta, index, tone = '', image = null }) {
   const inner = `
-    ${index ? `<span class="card__index" aria-hidden="true">${esc(index)}</span>` : ''}
+    ${
+      image
+        ? `<div class="card__media"><img src="${attr(image.src)}" alt="" width="${image.width || 720}" height="${
+            image.height || 480
+          }" loading="lazy" decoding="async"></div>`
+        : ''
+    }    ${index ? `<span class="card__index" aria-hidden="true">${esc(index)}</span>` : ''}
     <h3 class="card__title">${prose(title)}</h3>
     <p class="card__body">${prose(body)}</p>
     ${meta ? `<p class="card__meta">${prose(meta)}</p>` : ''}
@@ -86,7 +88,7 @@ function card({ title, body, href, meta, index, tone = '' }) {
         : ''
     }`;
 
-  const classes = ['card', tone ? `card--${tone}` : ''].filter(Boolean).join(' ');
+  const classes = ['card', tone ? `card--${tone}` : '', image ? 'card--media' : ''].filter(Boolean).join(' ');
 
   return href
     ? `<a class="${classes} card--link" href="${attr(href)}" data-motion="rise">${inner}</a>`
@@ -99,15 +101,19 @@ function cardGrid(cards, { cols = 3 } = {}) {
 
 /* ------------------------------------------------------------- dual paths */
 
+// The two photos are a matched pair — same light, same distance — so neither
+// door reads as the favoured one. Decorative: the card title carries the meaning.
 function dualPath() {
   return `<div class="dual" data-motion="stagger">
     <a class="dual__card dual__card--sea" href="/candidates">
+      <div class="dual__media"><img src="/assets/img/door/sea.webp" alt="" width="1200" height="675" loading="lazy" decoding="async"></div>
       <span class="dual__coord" aria-hidden="true">Course 1</span>
       <h3 class="dual__title">I want a job <em>ashore</em></h3>
       <p class="dual__body">You have the sea time. We translate it for shore-side employers, then put you in front of them.</p>
       <span class="dual__go">For candidates<svg viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
     <a class="dual__card dual__card--shore" href="/employers">
+      <div class="dual__media"><img src="/assets/img/door/shore.webp" alt="" width="1200" height="675" loading="lazy" decoding="async"></div>
       <span class="dual__coord" aria-hidden="true">Course 2</span>
       <h3 class="dual__title">I want to hire</h3>
       <p class="dual__body">Shortlists of three to five, each one defended in writing. Confidential when the market is small.</p>
@@ -118,16 +124,70 @@ function dualPath() {
 
 /* --------------------------------------------------------------- trust bar */
 
-function trustBar({ compact = false } = {}) {
-  const marks = clients
-    .map((c) => `<li class="logo-wall__item"><span class="wordmark">${esc(c.short)}</span></li>`)
+/**
+ * The client logo wall. `--i` drives the staggered entrance in CSS, which
+ * runs as an animation rather than motion.js's inline transition-delay — an
+ * inline delay would also slow every hover afterwards. Falls back to the
+ * typeset wordmark for any client without a logo file.
+ */
+function logoWall(list = clients, { className = '' } = {}) {
+  const items = list
+    .map((c, i) => {
+      const mark = c.logo
+        ? `<img class="logo-wall__logo" src="/assets/img/logos/${attr(c.logo.slug)}.webp" alt="${attr(
+            c.name
+          )}" width="${c.logo.w}" height="${c.logo.h}" loading="lazy" decoding="async">`
+        : `<span class="wordmark">${esc(c.short)}</span>`;
+      return `<li class="logo-wall__item" style="--i:${i}">${mark}</li>`;
+    })
     .join('\n      ');
 
-  return `<div class="trust${compact ? ' trust--compact' : ''}" data-motion="rise">
-    <p class="trust__label">Placed talent with</p>
-    <ul class="logo-wall">
-      ${marks}
-    </ul>
+  return `<ul class="logo-wall${className ? ` ${className}` : ''}" data-motion="logos">
+      ${items}
+    </ul>`;
+}
+
+/**
+ * Infinite logo cloud — a native port of the 21st.dev LogoCloud /
+ * InfiniteSlider pair (no React, no framer-motion). The set is rendered twice
+ * so the loop is seamless; the copy is aria-hidden so screen readers hear each
+ * client once. Without JS (or with reduced motion) the copy stays hidden and
+ * the first set simply wraps, centred — logo-cloud.js adds `is-running`.
+ *
+ * data-speed / data-speed-hover are px per second, matching the component's
+ * speed={80} speedOnHover={25}. data-reverse scrolls left-to-right.
+ */
+function logoCloud(list = clients, { speed = 80, speedHover = 25, reverse = true } = {}) {
+  const set = (hidden) =>
+    `<ul class="logo-cloud__set"${hidden ? ' aria-hidden="true" data-logo-clone' : ''}>
+        ${list
+          .map((c) => {
+            const mark = c.logo
+              ? `<img class="logo-cloud__logo" src="/assets/img/logos/${attr(c.logo.slug)}.webp" alt="${
+                  hidden ? '' : attr(c.name)
+                }" width="${c.logo.w}" height="${c.logo.h}" loading="lazy" decoding="async" draggable="false">`
+              : `<span class="wordmark">${esc(c.short)}</span>`;
+            return `<li class="logo-cloud__item">${mark}</li>`;
+          })
+          .join('\n        ')}
+      </ul>`;
+
+  return `<div class="logo-cloud" data-logo-cloud data-speed="${speed}" data-speed-hover="${speedHover}"${
+    reverse ? ' data-reverse' : ''
+  } data-motion="fade">
+    <div class="logo-cloud__track" data-logo-track>
+      ${set(false)}
+      ${set(true)}
+    </div>
+  </div>`;
+}
+
+function trustBar({ compact = false } = {}) {
+  return `<div class="trust${compact ? ' trust--compact' : ''}">
+    <h2 class="trust__label" data-motion="rise">Placed talent with</h2>
+    <div class="trust__rule trust__rule--short" aria-hidden="true"></div>
+    ${logoCloud()}
+    <div class="trust__rule" aria-hidden="true"></div>
     <p class="trust__note">
       <span class="badge">Star Women in Maritime 2022</span>
       <span class="trust__since">Since 2008 · 3 offices in India</span>
@@ -137,9 +197,21 @@ function trustBar({ compact = false } = {}) {
 
 /* ------------------------------------------------------------------ chips */
 
+/**
+ * Sector chips. An entry may be a plain string (a market we recruit into) or
+ * `{ label, href }` (a practice vertical with its own hub page). Linked chips
+ * get a hover affordance; the rest stay inert text, which is the honest signal
+ * — only three of these are desks you can actually read about.
+ */
 function sectorChips(list = sectors) {
   return `<ul class="chips" data-motion="stagger">
-    ${list.map((s) => `<li class="chip">${esc(s)}</li>`).join('\n    ')}
+    ${list
+      .map((s) =>
+        typeof s === 'string'
+          ? `<li class="chip">${esc(s)}</li>`
+          : `<li><a class="chip chip--link" href="${attr(s.href)}">${esc(s.label)}</a></li>`
+      )
+      .join('\n    ')}
   </ul>`;
 }
 
@@ -300,12 +372,20 @@ function ctaBand({
 
 /* ------------------------------------------------------------- page hero */
 
-/** Standard interior page hero (the home page has its own). */
-function pageHero({ eyebrow: eb, title, lede, actions = [], coord, aside = '' }) {
-  return `<section class="hero hero--page">
+/**
+ * Standard interior page hero (the home page has its own).
+ *
+ * Pass `image` ({ src, alt, width, height }) for a full-bleed photograph under
+ * the same left-to-right navy scrim as the home hero. It is the LCP element,
+ * so it loads eagerly.
+ */
+function pageHero({ title, lede, actions = [], aside = '', image = null }) {
+  const bg = image
+    ? `\n  <img class="hero__bg" src="${attr(image.src)}" alt="${attr(image.alt)}" width="${image.width}" height="${image.height}" loading="eager" fetchpriority="high" decoding="async">`
+    : '';
+  return `<section class="hero hero--page${image ? ' hero--photo' : ''}">${bg}
   <div class="wrap hero__inner">
     <div class="hero__text">
-      ${eb ? eyebrow(eb, { coord }) : ''}
       <h1 class="hero__title" data-motion="rise">${prose(title)}</h1>
       ${lede ? `<p class="hero__lede" data-motion="rise">${prose(lede)}</p>` : ''}
       ${actions.length ? btnRow(actions) : ''}
@@ -317,8 +397,22 @@ function pageHero({ eyebrow: eb, title, lede, actions = [], coord, aside = '' })
 
 /* --------------------------------------------------------------- articles */
 
+/** Cover image paths for a post, or null when it has no cover yet. */
+function postCover(post) {
+  if (!post.cover) return null;
+  const base = `/assets/img/post/${post.slug}`;
+  return { src: `${base}.webp`, card: `${base}-card.webp`, alt: post.cover.alt, width: 1536, height: 1024 };
+}
+
 function articleCard(post, { basePath = '/insights/blog' } = {}) {
-  return `<a class="post" href="${attr(basePath)}/${attr(post.slug)}" data-motion="rise">
+  const cover = postCover(post);
+  // alt="" — the card title right below says the same thing to a screen reader.
+  return `<a class="post${cover ? ' post--cover' : ''}" href="${attr(basePath)}/${attr(post.slug)}" data-motion="rise">
+    ${
+      cover
+        ? `<img class="post__cover" src="${attr(cover.card)}" alt="" width="800" height="450" loading="lazy" decoding="async">`
+        : ''
+    }
     <p class="post__meta"><span class="post__cat">${esc(post.category)}</span><span class="post__date">${esc(
     formatDate(post.date)
   )}</span></p>
@@ -333,6 +427,11 @@ function articleCard(post, { basePath = '/insights/blog' } = {}) {
 /**
  * Routed contact form. `segment` controls which address the submission is
  * addressed to, replacing the seven scattered inboxes.
+ *
+ * The `desk` select is deliberately NOT part of routing. Routing is the
+ * audience axis (candidate vs employer) and stays a two-key map; the desk is
+ * information for whoever reads the inbox, and it prefills from a `?desk=`
+ * parameter so the vertical hubs can hand off context.
  */
 function routedForm({ id = 'enquiry', defaultSegment = 'candidate', compact = false } = {}) {
   return `<form class="form${compact ? ' form--compact' : ''}" id="${attr(id)}" data-routed-form novalidate>
@@ -375,6 +474,15 @@ function routedForm({ id = 'enquiry', defaultSegment = 'candidate', compact = fa
       <label class="field__label" for="${attr(id)}-rank">Current rank or role</label>
       <input class="field__input" id="${attr(id)}-rank" name="rank" type="text" placeholder="e.g. Chief Engineer">
     </p>
+    <p class="field">
+      <label class="field__label" for="${attr(id)}-desk">Which desk? <span class="field__opt">optional</span></label>
+      <select class="field__input field__input--select" id="${attr(id)}-desk" name="desk" data-desk-select>
+        <option value="">Not sure</option>
+        <option value="maritime">Maritime</option>
+        <option value="logistics">Logistics</option>
+        <option value="legal">Legal</option>
+      </select>
+    </p>
   </div>
 
   <p class="field">
@@ -406,7 +514,6 @@ function routedForm({ id = 'enquiry', defaultSegment = 'candidate', compact = fa
 
 module.exports = {
   band,
-  eyebrow,
   sectionHead,
   btn,
   btnRow,
@@ -414,6 +521,8 @@ module.exports = {
   cardGrid,
   dualPath,
   trustBar,
+  logoWall,
+  logoCloud,
   sectorChips,
   processTimeline,
   testimonialCard,
@@ -425,5 +534,6 @@ module.exports = {
   ctaBand,
   pageHero,
   articleCard,
+  postCover,
   routedForm,
 };

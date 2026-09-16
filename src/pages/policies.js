@@ -19,7 +19,6 @@ const privacy = {
   priority: '0.3',
   render() {
     const hero = C.pageHero({
-      eyebrow: 'Legal',
       title: 'Privacy notice',
       lede: 'What we collect when you contact us or apply for a role, why we hold it, and how to get it removed.',
     });
@@ -90,7 +89,6 @@ const terms = {
   priority: '0.3',
   render() {
     const hero = C.pageHero({
-      eyebrow: 'Legal',
       title: 'Terms of use',
       lede: 'The terms covering use of this website. Recruitment engagements are governed by a separate signed agreement.',
     });

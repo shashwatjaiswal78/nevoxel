@@ -9,14 +9,18 @@ const overview = {
   priority: '0.9',
   render() {
     const hero = C.pageHero({
-      eyebrow: 'For employers',
-      coord: 'Course 2',
       title: 'Hire proven shore-based maritime talent',
       lede: 'Shortlists of three to five, each candidate interviewed by us first and defended in writing. Confidential when the market is small enough that advertising the role would tell your competitors what you are planning.',
       actions: [
         C.btn('Book a discovery call', '/contact?for=employer', { variant: 'solid', icon: true }),
         C.btn('See how we work', '#process', { variant: 'ghost' }),
       ],
+      image: {
+        src: '/assets/img/hero/employers.webp',
+        alt: 'Three colleagues discussing printed documents at an office table overlooking a port',
+        width: 1536,
+        height: 1024,
+      },
     });
 
     const problem = C.band({
@@ -37,7 +41,6 @@ const overview = {
     const services = C.band({
       tone: 'paper-alt',
       body: `    ${C.sectionHead({
-        eyebrow: 'Services',
         title: 'Three ways we work with you',
       })}
     ${C.cardGrid(
@@ -69,9 +72,8 @@ const overview = {
       tone: 'paper',
       size: 'tight',
       body: `    ${C.sectionHead({
-        eyebrow: 'Sectors served',
-        title: 'Maritime first, adjacent where the skills transfer',
-        lede: 'Our network is maritime. It reaches into these sectors because that is where maritime people go, and where maritime employers compete for talent.',
+        title: 'Three desks, and the markets around them',
+        lede: 'The first three are specialist desks with their own teams — follow them for the detail. The rest are markets we recruit into when a mandate touches one of the three.',
       })}
     ${C.sectorChips(sectors)}`,
     });
@@ -80,7 +82,6 @@ const overview = {
       tone: 'shoal',
       id: 'process',
       body: `    ${C.sectionHead({
-        eyebrow: 'Process',
         title: 'Brief to placement, then the first year',
         lede: 'Four steps, and a fifth that most agencies skip: we stay in contact after the start date, because the transition ashore is where placements wobble.',
       })}
@@ -104,7 +105,6 @@ const overview = {
       body: `    <div class="split">
       <div>
         ${C.sectionHead({
-          eyebrow: 'Brief us',
           title: 'Tell us your hiring need',
           lede: 'A short note is enough to start. We will come back with a view on the market, a realistic timeline, and what the package needs to look like to win.',
         })}
@@ -146,6 +146,7 @@ function servicePage({
   highlightsTitle,
   stats,
   faq,
+  image,
 }) {
   return {
     url,
@@ -159,6 +160,7 @@ function servicePage({
           C.btn(cta.label, cta.href, { variant: 'solid', icon: true }),
           C.btn('All employer services', '/employers', { variant: 'ghost' }),
         ],
+        image,
       });
 
       const whatBand = C.band({
@@ -166,7 +168,6 @@ function servicePage({
         coast: true,
         body: `    <div class="split">
       <div data-motion="rise">
-        ${C.eyebrow('What it is')}
         <p class="lede-lg">${what.summary}</p>
       </div>
       <div class="prose" data-motion="rise">
@@ -178,7 +179,6 @@ function servicePage({
       const outcomesBand = C.band({
         tone: 'paper-alt',
         body: `    ${C.sectionHead({
-          eyebrow: 'What you get',
           title: 'Deliverables, not promises',
         })}
     ${C.cardGrid(
@@ -193,7 +193,6 @@ function servicePage({
         ? C.band({
             tone: 'shoal',
             body: `    ${C.sectionHead({
-              eyebrow: 'Programme',
               title: highlightsTitle || 'Programme highlights',
             })}
     ${C.cardGrid(
@@ -214,7 +213,7 @@ function servicePage({
       const faqBand = faq
         ? C.band({
             tone: 'paper-alt',
-            body: `    ${C.sectionHead({ eyebrow: 'Questions', title: 'Before you brief us' })}
+            body: `    ${C.sectionHead({ title: 'Before you brief us' })}
     ${C.accordion(faq, { name: 'service-faq' })}`,
           })
         : '';
@@ -267,12 +266,20 @@ function servicePage({
 
 const maritimeRecruitment = servicePage({
   url: '/employers/maritime-recruitment',
-  eyebrow: 'Flagship service',
+  image: {
+    src: '/assets/img/hero/maritime-recruitment.webp',
+    alt: 'Interview in progress with two interviewers and a candidate across a table of printed CVs',
+    width: 1536,
+    height: 1024,
+  },
   title: 'Maritime shore recruitment',
   metaTitle: 'Maritime Shore Recruitment',
+  // Targets employer buying intent ("hire a marine superintendent", "maritime
+  // recruitment agency Mumbai"). The market and jobs phrases belong to the
+  // /maritime hub — keep the two apart or they compete with each other.
   description:
-    'Shore-based maritime recruitment for superintendents, operations, chartering, crewing and HSEQ roles. Shortlists of three to five, each candidate interviewed first.',
-  lede: 'Superintendents, operations, chartering, crewing, HSEQ. The desk we have run since 2008, and the one most of our placements come from.',
+    'Brief a maritime recruitment agency in Mumbai. Retained or contingent shore-based hiring for superintendents, operations, chartering, crewing and HSEQ — shortlists of three to five, each candidate interviewed first.',
+  lede: 'How a shore-side mandate actually runs with us: what we do, what you get back, and how long it takes. For the market itself, see <a href="/maritime">the maritime desk</a>.',
   cta: { label: 'Brief us on a role', href: '/contact?for=employer' },
   what: {
     summary:
@@ -323,7 +330,7 @@ const maritimeRecruitment = servicePage({
     {
       q: 'Do you work outside maritime?',
       a: [
-        'We recruit into logistics, energy, manufacturing, BFSI, pharma, technology and finance — but almost always where the role touches maritime, or where the candidate is coming from it. We are not a generalist agency and do not pretend to be.',
+        'We run two other desks — <a href="/logistics">logistics</a> and <a href="/legal">legal</a> — and recruit into adjacent markets where a mandate touches one of the three. We are not a generalist agency and do not pretend to be. <a href="/expertise">All three desks</a>.',
       ],
     },
     {
@@ -339,7 +346,12 @@ const maritimeRecruitment = servicePage({
 
 const executiveSearch = servicePage({
   url: '/employers/executive-search',
-  eyebrow: 'Retained · confidential',
+  image: {
+    src: '/assets/img/hero/executive-search.webp',
+    alt: 'Two senior professionals in private conversation in a meeting room, seen through a half-open door',
+    width: 1536,
+    height: 1024,
+  },
   title: 'Executive search',
   metaTitle: 'Executive Search',
   description:
@@ -403,7 +415,12 @@ const executiveSearch = servicePage({
 
 const hrAdvisory = servicePage({
   url: '/employers/hr-advisory',
-  eyebrow: 'Advisory · NECD',
+  image: {
+    src: '/assets/img/hero/hr-advisory.webp',
+    alt: 'Facilitator leading a small seated briefing session beside a blank flip chart',
+    width: 1536,
+    height: 1024,
+  },
   title: 'HR advisory (NECD)',
   metaTitle: 'HR Advisory (NECD)',
   description:

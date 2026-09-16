@@ -2,22 +2,34 @@
  * Route manifest.
  *
  * Every page in the site, in sitemap order. Adding a page means adding it
- * here — the builder, the XML sitemap and the nav all read from this list.
+ * here — the builder and the XML sitemap read from this list.
+ *
+ * The nav is a separate list (`nav` in content/site.js) and is NOT derived
+ * from this one, so a new page needs registering in both places.
  */
 
 const { site } = require('./content/site');
 
 const home = require('./pages/home');
+const expertise = require('./pages/expertise');
 const employers = require('./pages/employers');
 const candidates = require('./pages/candidates');
 const jobs = require('./pages/jobs');
 const about = require('./pages/about');
 const insights = require('./pages/insights');
 const contact = require('./pages/contact');
-const legal = require('./pages/legal');
+// Privacy / terms / 404. Named `policies` rather than `legal` so it is not
+// confused with the Nevoxel Legal vertical at /legal.
+const policies = require('./pages/policies');
 
 const pages = [
   home,
+
+  // Expertise — the practice verticals
+  expertise.overview,
+  expertise.maritime,
+  expertise.logistics,
+  expertise.legal,
 
   // For Employers
   employers.overview,
@@ -45,9 +57,9 @@ const pages = [
 
   // Contact + utility
   contact,
-  legal.privacy,
-  legal.terms,
-  legal.notFound,
+  policies.privacy,
+  policies.terms,
+  policies.notFound,
 ];
 
 /* --------------------------------------------------------------- sanity */

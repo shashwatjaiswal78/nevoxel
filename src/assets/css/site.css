@@ -488,53 +488,6 @@ em {
 
 /* ------------------------------------------------------------ typography */
 
-/* Eyebrow — 11px mono, 0.14em, caps. Slate on light, signal-400 on navy.
-   Never orange on a light surface: at this size it fails contrast and it
-   would spend the one orange the page is allowed. */
-.eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-  font-family: var(--mono);
-  font-size: var(--fs-eyebrow);
-  letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
-  color: var(--slate-400);
-  margin: 0 0 var(--s3);
-}
-
-.band--deep .eyebrow,
-.band--shoal .eyebrow,
-.hero .eyebrow {
-  color: var(--signal-400);
-}
-
-/* The tick is a hairline, not a coloured mark. */
-.eyebrow__tick {
-  width: 22px;
-  height: 1px;
-  background: var(--line-strong);
-  flex: none;
-}
-
-.band--deep .eyebrow__tick,
-.band--shoal .eyebrow__tick,
-.hero .eyebrow__tick {
-  background: var(--sea-line);
-}
-
-.eyebrow__coord {
-  margin-left: auto;
-  color: var(--slate-400);
-  letter-spacing: var(--tracking-eyebrow);
-}
-
-.band--deep .eyebrow__coord,
-.band--shoal .eyebrow__coord,
-.hero .eyebrow__coord {
-  color: var(--sea-fg-50);
-}
-
 .sec-head {
   max-width: 60ch;
   margin-bottom: var(--s5);
@@ -543,14 +496,6 @@ em {
 .sec-head--center {
   margin-inline: auto;
   text-align: center;
-}
-
-.sec-head--center .eyebrow {
-  justify-content: center;
-}
-
-.sec-head--center .eyebrow__coord {
-  display: none;
 }
 
 .sec-head__title {
@@ -836,7 +781,13 @@ em {
   transform: rotate(180deg);
 }
 
-@media (max-width: 1000px) {
+/* Six nav groups need 1128px of header to sit on one row (brand 159 + nav 659
+   + actions 214 + two 24px gaps + 48px of gutter), measured at 1240. So the
+   drawer takes over at 1140 rather than the usual tablet breakpoint, with a
+   little margin. Re-measure if a nav label changes — a longer label moves it.
+   The three 1140px rules in this file (nav, masthead actions, burger) are one
+   switch: move them together or the header will contradict itself. */
+@media (max-width: 1140px) {
   .nav {
     display: none;
   }
@@ -930,7 +881,7 @@ em {
   margin-left: auto;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1140px) {
   .masthead__actions .btn {
     display: none;
   }
@@ -967,7 +918,7 @@ em {
   transform: translateY(-3.25px) rotate(-45deg);
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1140px) {
   .burger {
     display: flex;
   }
@@ -1078,10 +1029,13 @@ em {
   overflow: hidden;
 }
 
+/* 16:9 as a *floor*, not a fixed ratio. The slideshow deck is taller than the
+   old static hero (eyebrow + desk link + controls), and .hero has
+   overflow:hidden — an aspect-ratio with a max-height would silently clip the
+   controls at some widths rather than growing. clamp keeps the same 16:9 look
+   at ordinary widths while letting the box grow when the content needs it. */
 .hero--home {
-  aspect-ratio: 16 / 9;
-  min-height: 460px;
-  max-height: 900px;
+  min-height: clamp(460px, 56.25vw, 900px);
   display: flex;
   align-items: center;
   padding-block: clamp(var(--s6), 6vh, var(--s7));
@@ -1096,7 +1050,278 @@ em {
   z-index: 0;
 }
 
-.hero--home::after {
+/* ---- home hero slideshow ------------------------------------------------ */
+
+/* One layer per desk, stacked and cross-faded. The navy scrim (::after) sits
+   above all of them, so it is painted once rather than per slide. */
+.hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--navy-950);
+}
+
+.hero__layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 640ms var(--ease);
+}
+
+.hero__layer.is-active {
+  opacity: 1;
+}
+
+/* The legal desk has no photography yet, so its layer is the clause drawing on
+   navy — plain white line work, no fill, the same device the home hero used
+   before the vessel photo arrived. Sits right of centre, where the scrim is
+   lightest and the headline is not. */
+.hero__mark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-inline: clamp(var(--s4), 8vw, 12vw);
+}
+
+/* Overrides .hub-mark's own max-width — in the hero the drawing is sized by
+   the hero, not by the interior-page aside it was written for. */
+.hero__mark svg {
+  width: min(46%, 460px);
+  max-width: none;
+  height: auto;
+  max-height: 78%;
+}
+
+/* Slides share one grid cell so the deck is as tall as the tallest slide and
+   nothing reflows as they rotate. */
+.hero__deck {
+  display: grid;
+}
+
+.hero__slide {
+  grid-area: 1 / 1;
+  opacity: 0;
+  /* visibility, not opacity alone: an invisible slide still contains a link,
+     and opacity:0 would leave it focusable. */
+  visibility: hidden;
+  transition:
+    opacity 520ms var(--ease),
+    visibility 0s linear 520ms;
+}
+
+.hero__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 520ms var(--ease),
+    visibility 0s;
+}
+
+/* The quiet third link. The two doors below it stay the only buttons. */
+.hero__deskline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 44px;
+  margin-top: var(--s3);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.32);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+
+.hero__deskline:hover {
+  border-bottom-color: #fff;
+}
+
+.hero__deskline svg {
+  width: 16px;
+  flex: none;
+}
+
+/* ---- slideshow controls ------------------------------------------------- */
+
+/* Dots are the only control in the text column — a quiet row under the doors. */
+.hero__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-top: var(--s4);
+}
+
+.hero__dots {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: -9px; /* optically align the first mark with the text edge */
+}
+
+/* A short bar inside a 44px target — the hit area is the button, the ::before
+   is what you see. The current slide's bar is longer, so position reads
+   without relying on colour alone. */
+.hero__dot {
+  position: relative;
+  width: 28px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.hero__dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 10px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  transition: width 320ms var(--ease), background var(--dur-fast) var(--ease);
+}
+
+.hero__dot:hover::before {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.hero__dot.is-current {
+  width: 40px;
+}
+
+.hero__dot.is-current::before {
+  width: 24px;
+  background: #fff;
+}
+
+/* Pause/play: required by WCAG 2.2.2 for auto-advancing content, but not shown
+   to pointer users. Visually hidden until a keyboard user tabs onto it. */
+.hero__pause {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-family: var(--body);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+
+.hero__pause:focus-visible {
+  position: static;
+  width: auto;
+  height: 32px;
+  margin: 0;
+  padding: 0 0.875rem;
+  overflow: visible;
+  clip: auto;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+}
+
+/* Side arrows — vertically centred on the hero's edges, frosted and quiet at
+   rest, fully present only when reached for. */
+.hero__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  translate: 0 -50%;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 240ms var(--ease), color 240ms var(--ease),
+    background 240ms var(--ease), border-color 240ms var(--ease),
+    transform 240ms var(--ease);
+}
+
+.hero__arrow[hidden] {
+  display: none;
+}
+
+.hero__arrow--prev {
+  left: clamp(12px, 2.2vw, 40px);
+}
+
+.hero__arrow--next {
+  right: clamp(12px, 2.2vw, 40px);
+}
+
+.hero__arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Arrows brighten a little when the pointer is anywhere over the hero. */
+.hero--home:hover .hero__arrow {
+  opacity: 1;
+}
+
+.hero__arrow:hover,
+.hero__arrow:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.hero__arrow--prev:hover {
+  transform: translateX(-2px);
+}
+
+.hero__arrow--next:hover {
+  transform: translateX(2px);
+}
+
+/* Between 900 and 1360px the container margin is narrower than an arrow, so
+   the text column steps in far enough that the left arrow never sits on the
+   headline. */
+@media (min-width: 901px) and (max-width: 1360px) {
+  .hero--home .hero__inner {
+    padding-inline: 88px;
+  }
+}
+
+/* Below 900px the dots do the job on their own and the arrows would collide
+   with the text. */
+@media (max-width: 900px) {
+  .hero__arrow {
+    display: none;
+  }
+}
+
+/* Reduced motion: no cross-fade, no auto-advance (hero.js enforces the second
+   half). Slides cut instantly and only when asked for. */
+@media (prefers-reduced-motion: reduce) {
+  .hero__layer,
+  .hero__slide {
+    transition: none;
+  }
+}
+
+.hero--home::after,
+.hero--photo::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -1125,7 +1350,6 @@ em {
 
 @media (max-width: 940px) {
   .hero--home {
-    aspect-ratio: auto;
     min-height: 560px;
   }
 }
@@ -1191,6 +1415,30 @@ em {
 /* With no aside the hero is a single column. The measure is capped on the
    text, not on the container, so the headline stays on the same left grid
    line as every section below it. */
+/* ---- hero aside --------------------------------------------------------- */
+
+/* A plain white line drawing where a page has no photograph. Orange never
+   appears in or over imagery. */
+.hero__aside {
+  display: flex;
+  justify-content: center;
+}
+
+.hub-mark {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+}
+
+@media (max-width: 900px) {
+  /* Decorative, and on a narrow screen it costs vertical space the headline
+     and the two doors need more. */
+  .hero__aside {
+    display: none;
+  }
+}
+
 .hero--page:not(:has(.hero__aside)) .hero__inner {
   grid-template-columns: 1fr;
 }
@@ -1203,6 +1451,27 @@ em {
   .hero--page .hero__inner {
     grid-template-columns: 1fr;
     gap: var(--s4);
+  }
+}
+
+/* Hero pattern A on an interior page — full-bleed photograph under the same
+   left-to-right scrim as the home hero, headline on the dark left side. Shorter
+   than the home hero: this is a page opener, not the brand statement. */
+.hero--photo {
+  min-height: clamp(440px, 40vw, 640px);
+  display: flex;
+  align-items: center;
+}
+
+.hero--page.hero--photo .hero__text {
+  max-width: 640px;
+}
+
+/* Below 768 the headline spans the full width, so the light right-hand end of
+   the scrim would sit under text. Flatten it to an even, readable wash. */
+@media (max-width: 768px) {
+  .hero--photo::after {
+    background: rgba(7, 20, 38, 0.8);
   }
 }
 
@@ -1259,6 +1528,54 @@ em {
 
 .dual__card--shore:hover {
   border-color: var(--line-strong);
+}
+
+/* Same treatment as .card__media: the photo bleeds to the card edges
+   (negative margins undo the padding) and the card clips it to its own
+   radius, with the same slow push-in on hover. 16:9 rather than 3:2 because
+   these cards are twice as wide — 3:2 would push the text below the fold. */
+.dual__card {
+  overflow: hidden;
+}
+
+.dual__media {
+  margin: calc(-1 * var(--s5)) calc(-1 * var(--s5)) var(--s4);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--mist-50);
+}
+
+.dual__card--sea .dual__media {
+  background: var(--navy-800);
+}
+
+/* Hairline only on the light card; on navy the surface change is the edge. */
+.dual__card--shore .dual__media {
+  border-bottom: 1px solid var(--line);
+}
+
+.dual__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms var(--ease);
+}
+
+.dual__card:hover .dual__media img,
+.dual__card:focus-visible .dual__media img {
+  transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dual__media img {
+    transition: none;
+  }
+
+  .dual__card:hover .dual__media img,
+  .dual__card:focus-visible .dual__media img {
+    transform: none;
+  }
 }
 
 .dual__coord {
@@ -1334,13 +1651,132 @@ em {
   text-align: center;
 }
 
+/* Set as a display heading rather than an 11px mono eyebrow — the logo cloud
+   is a proof point and the line introducing it should be read, not skimmed. */
 .trust__label {
-  font-family: var(--mono);
-  font-size: var(--fs-eyebrow);
-  letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
-  color: var(--slate-400);
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 3vw, 2.125rem);
+  font-weight: var(--fw-bold);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--navy-900);
   margin-bottom: var(--s3);
+}
+
+/* Hairlines that fade out at both ends, above and below the cloud. */
+.trust__rule {
+  height: 1px;
+  background: var(--line-strong);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000, transparent);
+  mask-image: linear-gradient(to right, transparent, #000, transparent);
+  margin-bottom: var(--s4);
+}
+
+.trust__rule--short {
+  max-width: 24rem;
+  margin: 0 auto var(--s2);
+}
+
+/* ---- infinite logo cloud ------------------------------------------------ */
+
+/* Edges fade to transparent so logos arrive and leave rather than being cut
+   off by the container. */
+.logo-cloud {
+  --logo-cloud-gap: 64px;
+  overflow: hidden;
+  padding-block: var(--s3);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+}
+
+.logo-cloud__track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+/* Each set carries the gap as trailing padding too, so set 1 + gap is exactly
+   half the track and the loop has no visible seam. */
+.logo-cloud__set {
+  display: flex;
+  align-items: center;
+  gap: var(--logo-cloud-gap);
+  padding-right: var(--logo-cloud-gap);
+  margin: 0;
+  list-style: none;
+}
+
+.logo-cloud__item {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+}
+
+.logo-cloud__logo {
+  display: block;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: grayscale(1) contrast(1.05);
+  opacity: 0.55;
+  transition: filter 360ms var(--ease), opacity 360ms var(--ease),
+    transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* The whole row slows (logo-cloud.js); the logo under the pointer also takes
+   its own colour, so the slowdown has a reason. */
+.logo-cloud__item:hover .logo-cloud__logo {
+  filter: none;
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+@media (hover: none) {
+  .logo-cloud__logo {
+    filter: none;
+    opacity: 1;
+  }
+}
+
+/* Static fallback — no JS, or reduced motion: one centred, wrapping set and no
+   edge fade (nothing is moving through the edges). */
+.logo-cloud:not(.is-running) {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* Block, not flex: as a flex item the set keeps its min-content width and
+   overflows off both edges instead of wrapping. */
+.logo-cloud:not(.is-running) .logo-cloud__track {
+  display: block;
+  width: auto;
+}
+
+.logo-cloud:not(.is-running) .logo-cloud__set {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s3) var(--s5);
+  padding-right: 0;
+}
+
+.logo-cloud:not(.is-running) [data-logo-clone] {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .logo-cloud {
+    --logo-cloud-gap: 44px;
+  }
+
+  .logo-cloud__logo {
+    transform: scale(0.85);
+  }
+
+  .logo-cloud__item:hover .logo-cloud__logo {
+    transform: scale(0.92);
+  }
 }
 
 .band--deep .trust__label,
@@ -1348,49 +1784,158 @@ em {
   color: var(--sea-fg-50);
 }
 
-/* A ruled wall, not a marquee — a static grid reads as a client list, a
-   scrolling carousel reads as a SaaS landing page. Each cell carries its own
-   hairline and adjacent hairlines meet in the 1px gap, so a part-filled last
-   row leaves white space rather than an empty grey block. */
+/* A static wall, not a marquee — a fixed row reads as a client list, a
+   scrolling carousel reads as a SaaS landing page. The motion is spent on
+   arrival and on hover instead.
+
+   Flex rather than grid so a part-filled last row centres instead of hanging
+   left: seven logos wrap 7 → 4+3 → 2+2+2+1, always centred. */
 .logo-wall {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 1px;
+  --logo-gap: var(--s2);
+  --logo-cols: 7;
+  --logo-scale: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--logo-gap);
   margin-bottom: var(--s4);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .logo-wall {
-    grid-template-columns: repeat(3, 1fr);
+    --logo-cols: 4;
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 560px) {
   .logo-wall {
-    grid-template-columns: repeat(2, 1fr);
+    --logo-cols: 2;
   }
 }
 
 .logo-wall__item {
+  position: relative;
+  flex: 0 0 calc((100% - (var(--logo-cols) - 1) * var(--logo-gap)) / var(--logo-cols));
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 78px;
+  min-height: 92px;
   padding: var(--s2);
   background: var(--page);
-  box-shadow: 0 0 0 1px var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: transform 320ms var(--ease), box-shadow 320ms var(--ease),
+    border-color 320ms var(--ease);
 }
 
-.band--paper-alt .logo-wall__item {
-  background: var(--page);
+/* Navy rule that draws out from the centre on hover. Navy, not orange:
+   orange is reserved for actions and never sits on imagery. */
+.logo-wall__item::after {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 0;
+  height: 2px;
+  background: var(--navy-900);
+  border-radius: 2px 2px 0 0;
+  transform: scaleX(0);
+  transition: transform 360ms var(--ease);
 }
 
-.band--deep .logo-wall__item,
-.band--shoal .logo-wall__item {
-  background: transparent;
-  box-shadow: 0 0 0 1px var(--sea-line);
+/* At rest every mark is set in one tone, so seven brand palettes read as a
+   single calm row; hover gives the one you are looking at its own colour. */
+.logo-wall__logo {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  filter: grayscale(1) contrast(1.05);
+  opacity: 0.6;
+  transform: scale(var(--logo-scale));
+  transition: filter 360ms var(--ease), opacity 360ms var(--ease),
+    transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
+.logo-wall__item:hover {
+  transform: translateY(-3px);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.logo-wall__item:hover::after {
+  transform: scaleX(1);
+}
+
+.logo-wall__item:hover .logo-wall__logo {
+  filter: none;
+  opacity: 1;
+  transform: scale(calc(var(--logo-scale) * 1.08));
+}
+
+/* Touch screens have no hover, so a grey wall would never show its colours. */
+@media (hover: none) {
+  .logo-wall__logo {
+    filter: none;
+    opacity: 1;
+  }
+}
+
+/* /about/clients — the wall is the page, so the marks are set larger. */
+.logo-wall--large {
+  --logo-scale: 1.3;
+  --logo-gap: var(--s3);
+  --logo-cols: 4;
+  justify-content: flex-start;
+}
+
+.logo-wall--large .logo-wall__item {
+  min-height: 140px;
+}
+
+@media (max-width: 560px) {
+  .logo-wall--large {
+    --logo-cols: 2;
+    --logo-scale: 1.1;
+  }
+}
+
+/* Arrival — cells rise in one after another while each logo comes into focus.
+   An animation with fill-mode backwards, so once it ends the element's own
+   transform is free again for the hover lift. Hidden only when motion is
+   allowed and motion.js has not yet marked the wall as in view. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion='logos']:not(.is-in) .logo-wall__item {
+    opacity: 0;
+  }
+
+  [data-motion='logos'].is-in .logo-wall__item {
+    animation: logo-cell-in 620ms var(--ease) backwards;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+
+  [data-motion='logos'].is-in .logo-wall__logo {
+    animation: logo-mark-in 900ms var(--ease) backwards;
+    animation-delay: calc(var(--i, 0) * 80ms + 120ms);
+  }
+}
+
+@keyframes logo-cell-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@keyframes logo-mark-in {
+  from {
+    opacity: 0;
+    filter: grayscale(1) blur(6px);
+    transform: scale(calc(var(--logo-scale) * 0.86));
+  }
+}
+
+/* Fallback for a client with no logo file yet. */
 .wordmark {
   font-family: var(--display);
   font-weight: var(--fw-bold);
@@ -1401,18 +1946,8 @@ em {
   transition: color var(--dur-fast) var(--ease);
 }
 
-.band--deep .wordmark,
-.band--shoal .wordmark {
-  color: var(--sea-fg-50);
-}
-
 .logo-wall__item:hover .wordmark {
   color: var(--navy-900);
-}
-
-.band--deep .logo-wall__item:hover .wordmark,
-.band--shoal .logo-wall__item:hover .wordmark {
-  color: #ffffff;
 }
 
 .trust__note {
@@ -1541,6 +2076,57 @@ em {
   box-shadow: none;
 }
 
+/* Photo card — the image bleeds to the card edges (negative margins undo the
+   padding) and the card clips it to its own radius, so photo and card read as
+   one object rather than a picture dropped into a box. */
+.card--media {
+  overflow: hidden;
+}
+
+.card__media {
+  margin: calc(-1 * var(--s3)) calc(-1 * var(--s3)) var(--s3);
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--mist-50);
+  border-bottom: 1px solid var(--line);
+}
+
+.card__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms var(--ease);
+}
+
+/* With photos lining the cards up at the top, a tag that floats at a different
+   height in each card reads as ragged — pin it and the arrow to the bottom. */
+.card--media .card__meta {
+  margin-top: auto;
+  padding-top: var(--s2);
+}
+
+.card--media .card__go {
+  margin-top: 0;
+}
+
+/* A slow, small push-in: enough to say "this opens", not enough to distract. */
+.card--link:hover .card__media img,
+.card--link:focus-visible .card__media img {
+  transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card__media img {
+    transition: none;
+  }
+
+  .card--link:hover .card__media img,
+  .card--link:focus-visible .card__media img {
+    transform: none;
+  }
+}
+
 .card__index {
   font-family: var(--mono);
   font-size: var(--fs-eyebrow);
@@ -1620,8 +2206,15 @@ em {
   gap: var(--s1);
 }
 
+/* Three of these are links now (the live practice verticals), so the whole row
+   carries the documented 44px minimum touch target rather than mixing a 34px
+   plain chip with a 44px tappable one. The 8px row gap is too tight to extend
+   a hit area with a pseudo-element without adjacent rows overlapping. */
 .chip {
-  padding: 6px 13px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 14px;
   background: var(--mist-50);
   border: 1px solid transparent;
   border-radius: var(--radius-tag);
@@ -1631,11 +2224,40 @@ em {
   color: var(--slate-600);
 }
 
+/* A chip that leads somewhere — the three live practice verticals. Structure
+   carries the affordance: a visible border and heading ink, not a colour
+   change. Orange stays on buttons. */
+.chip--link {
+  border-color: var(--line-strong);
+  color: var(--navy-800);
+  text-decoration: none;
+  transition:
+    background var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+
+.chip--link:hover {
+  background: var(--paper);
+  border-color: var(--navy-800);
+}
+
 .band--deep .chip,
 .band--shoal .chip {
   background: transparent;
   border-color: var(--sea-line);
   color: var(--sea-fg-70);
+}
+
+.band--deep .chip--link,
+.band--shoal .chip--link {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.band--deep .chip--link:hover,
+.band--shoal .chip--link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #fff;
 }
 
 /* ================================================================ TIMELINE */
@@ -2585,6 +3207,29 @@ em {
   border-top-color: var(--signal-600);
 }
 
+/* With a cover the photo leads the card, so the rule above it is dropped —
+   a line over a photo reads as a stray border. */
+.post--cover {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.post__cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-media);
+  background: var(--mist-50);
+  margin-bottom: var(--s3);
+}
+
+/* Blog index lead post — a 21:9 band across the full content width. */
+.post__cover--lead {
+  aspect-ratio: 21 / 9;
+}
+
 .post__meta {
   display: flex;
   align-items: center;
@@ -2733,13 +3378,21 @@ em {
 
 /* =================================================================== TEAM */
 
+/* Four across on wide screens, two on tablets, one on phones — so four
+   members never leave a single card stranded on a row of its own. */
 .team {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--s3);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1180px) {
+  .team {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
   .team {
     grid-template-columns: 1fr;
   }
@@ -2781,20 +3434,13 @@ em {
   color: #ffffff;
 }
 
-/* The graticule overlay is gone — flat surfaces, no mesh. */
-.member__grat {
-  display: none;
-}
-
-.member__coord {
+/* Photo portrait — fills the slot. */
+.member__photo {
   position: absolute;
-  right: 12px;
-  bottom: 10px;
-  z-index: 2;
-  font-family: var(--mono);
-  font-size: 0.625rem;
-  letter-spacing: var(--tracking-eyebrow);
-  color: var(--sea-fg-50);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .member__name {
@@ -2810,6 +3456,12 @@ em {
   text-transform: none;
   font-weight: var(--fw-book);
   color: var(--slate-400);
+}
+
+/* In a flex column the flag would stretch full width — keep it a tag. */
+.member .quote__flag {
+  align-self: flex-start;
+  margin-bottom: var(--s2);
 }
 
 .member__bio {
@@ -3040,6 +3692,29 @@ em {
   min-height: 120px;
 }
 
+/* Select control — same chevron treatment as the job board filters, so the two
+   selects on the site look like one component. */
+.field__input--select {
+  padding-right: 2rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2377848f' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  background-size: 10px;
+}
+
+/* On navy the chevron has to invert too, or it disappears into the surface. */
+.band--deep .field__input--select,
+.band--shoal .field__input--select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* Native option lists inherit the page background, not the navy panel. */
+.field__input--select option {
+  color: var(--navy-900);
+  background: var(--page);
+}
+
 /* Errors use signal-800, the darkest orange — legible as small text. */
 .field__input[aria-invalid='true'] {
   border-color: var(--signal-800);
@@ -3236,24 +3911,27 @@ em {
   color: var(--sea-fg);
 }
 
+/* Brand · four link columns · signup. The brand and signup keep more weight
+   than a link column but less than they did at three, so the four link lists
+   still hold "Resume & coaching" on one line. */
 .footer__grid {
   display: grid;
-  grid-template-columns: 1.6fr repeat(3, 1fr) 1.4fr;
+  grid-template-columns: 1.5fr repeat(4, 1fr) 1.3fr;
   gap: var(--s4);
   padding-block: var(--s6);
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1180px) {
   .footer__grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
   .footer__brand,
   .footer__signup {
-    grid-column: span 3;
+    grid-column: span 4;
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 820px) {
   .footer__grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -3719,12 +4397,9 @@ button,
   font-weight: var(--fw-button);
 }
 
-/* Everything set in the mono eyebrow style: 11px, 0.14em, uppercase. */
-.eyebrow,
-.eyebrow__coord,
+/* Everything set in the mono label style: 11px, 0.14em, uppercase. */
 .mega__blurb,
 .dual__coord,
-.trust__label,
 .card__meta,
 .card__index,
 .office__role,

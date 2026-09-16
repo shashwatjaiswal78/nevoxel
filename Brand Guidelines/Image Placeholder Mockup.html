@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nevoxel — Image Placeholder Mockup</title>
+<meta name="robots" content="noindex, nofollow">
+
+<style>
+  @font-face { font-family:'Plus Jakarta Sans'; src: url('../src/assets/fonts/PlusJakartaSans-latin.woff2') format('woff2'); font-weight:200 800; font-display:swap; }
+  @font-face { font-family:'Onest'; src: url('../src/assets/fonts/Onest-latin.woff2') format('woff2'); font-weight:100 900; font-display:swap; }
+  @font-face { font-family:'JetBrains Mono'; src: url('../src/assets/fonts/JetBrainsMono-latin.woff2') format('woff2'); font-weight:100 800; font-display:swap; }
+
+  :root{
+    --navy-950:#071426; --navy-900:#0b1f3a; --navy-800:#173352; --navy-700:#33455a;
+    --slate-600:#465666; --slate-500:#5a6876; --slate-400:#77848f; --slate-300:#a9b3bc;
+    --signal-50:#fdede7; --signal-400:#ff7a47; --signal-600:#e8541f; --signal-800:#b33f13;
+    --page:#ffffff; --mist-50:#f4f6f8; --line:#e2e6ea; --line-strong:#c8d0d8;
+    --r-tag:6px; --r-lg:8px; --r-media:12px; --r-pill:999px;
+    --display:'Plus Jakarta Sans',system-ui,sans-serif;
+    --body:'Onest',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --wrap:1240px;
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--page);color:var(--navy-900);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  img,svg{max-width:100%;display:block;}
+  h1,h2,h3,h4{font-family:var(--display);margin:0;letter-spacing:-0.02em;}
+  p{margin:0;}
+  a{color:inherit;}
+  .wrap{max-width:var(--wrap);margin-inline:auto;padding-inline:24px;}
+  .band{padding-block:64px;position:relative;}
+  .band--tight{padding-block:40px;}
+  .band--mist{background:var(--mist-50);}
+  .band--navy{background:var(--navy-900);color:#fff;}
+  .eyebrow{font-family:var(--mono);font-size:.6875rem;letter-spacing:.14em;text-transform:uppercase;color:var(--slate-400);margin:0 0 10px;display:flex;align-items:center;gap:10px;}
+  .band--navy .eyebrow{color:var(--signal-400);}
+  .eyebrow::before{content:'';width:22px;height:1px;background:var(--line-strong);}
+  .band--navy .eyebrow::before{background:rgba(255,255,255,.3);}
+  .slot-tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--signal-800);background:var(--signal-50);border:1px solid #f7d9cc;border-radius:var(--r-pill);padding:4px 10px;margin-bottom:14px;}
+
+  /* -------------------------------------------------- placeholder component */
+  .imgph{
+    position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; text-align:center; padding:16px;
+    border:2px dashed var(--line-strong); border-radius:var(--r-media);
+    background:repeating-linear-gradient(135deg, var(--mist-50) 0 10px, #ffffff 10px 20px);
+    color:var(--slate-500);
+  }
+  .imgph--dark{
+    border-color:rgba(255,255,255,.32);
+    background:repeating-linear-gradient(135deg, rgba(255,255,255,.05) 0 10px, rgba(255,255,255,.09) 10px 20px);
+    color:rgba(255,255,255,.75);
+  }
+  .imgph__icon{width:30px;height:30px;opacity:.55;flex:none;}
+  .imgph__label{font-family:var(--display);font-weight:700;font-size:.9rem;letter-spacing:-0.01em;}
+  .imgph--dark .imgph__label{color:#fff;}
+  .imgph__meta{font-family:var(--mono);font-size:.6875rem;letter-spacing:.06em;text-transform:uppercase;opacity:.85;}
+  .imgph__brief{font-size:.75rem;line-height:1.45;max-width:34ch;opacity:.9;}
+  .imgph--sm .imgph__icon{width:20px;height:20px;}
+  .imgph--sm .imgph__label{font-size:.75rem;}
+  .imgph--sm .imgph__meta{font-size:.625rem;}
+  .imgph--sm .imgph__brief{display:none;}
+
+  /* full-bleed placeholders sit behind overlaid text, so the label is
+     pinned to a bottom corner instead of centred, to stay clear of it */
+  .imgph--corner{align-items:flex-end;justify-content:flex-end;text-align:right;padding:20px 24px;}
+  .imgph--corner .imgph__brief{display:none;}
+
+  .icon-frame{width:100%;height:100%;}
+
+  /* -------------------------------------------------------------- masthead */
+  .masthead{border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:50;}
+  .masthead__inner{display:flex;align-items:center;gap:28px;height:72px;}
+  .brand{display:flex;align-items:center;gap:9px;text-decoration:none;flex:none;}
+  .brand__mark{width:26px;height:26px;background:var(--navy-900);border-radius:5px;position:relative;flex:none;}
+  .brand__mark::before{content:'';position:absolute;inset:8px 6px auto 6px;height:2.5px;background:var(--signal-600);}
+  .brand__mark::after{content:'';position:absolute;inset:auto 6px 8px 6px;height:2.5px;background:#fff;}
+  .brand__name{font-family:var(--display);font-weight:800;font-size:1.1rem;letter-spacing:-0.03em;color:var(--navy-900);}
+  .mock-nav{display:flex;gap:22px;font-size:.875rem;font-weight:500;color:var(--navy-700);margin-left:8px;}
+  .mock-nav span.is-current{color:var(--navy-900);font-weight:600;border-bottom:2px solid var(--signal-600);padding-bottom:2px;}
+  .mock-actions{display:flex;gap:8px;margin-left:auto;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;border-radius:var(--r-pill);font-family:var(--body);font-weight:600;font-size:.8125rem;text-decoration:none;white-space:nowrap;border:1px solid transparent;}
+  .btn--navy{background:var(--navy-900);color:#fff;}
+  .btn--solid{background:var(--signal-600);color:#fff;}
+  .btn--outline{background:transparent;color:var(--navy-900);border-color:var(--line-strong);}
+  .btn--inverse{background:#fff;color:var(--navy-900);}
+  .btn--ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5);}
+
+  /* ---------------------------------------------------------------- cover */
+  .cover{background:var(--navy-950);color:#fff;padding:56px 0 40px;}
+  .cover .wrap{display:flex;flex-direction:column;gap:18px;}
+  .cover h1{font-size:clamp(1.75rem,3.4vw,2.5rem);line-height:1.1;letter-spacing:-0.03em;max-width:22ch;}
+  .cover p{color:rgba(255,255,255,.72);max-width:70ch;font-size:.9375rem;line-height:1.65;}
+  .cover-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}
+  .cover-meta span{font-family:var(--mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.22);border-radius:var(--r-tag);padding:5px 10px;}
+
+  /* --------------------------------------------------------------- legend */
+  .legend{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start;padding:24px;background:var(--mist-50);border:1px solid var(--line);border-radius:var(--r-media);}
+  .legend .imgph{height:120px;}
+  .legend-copy h3{font-size:1.05rem;margin-bottom:8px;}
+  .legend-copy p{font-size:.875rem;color:var(--slate-600);line-height:1.6;margin-bottom:8px;}
+  .legend-copy code{font-family:var(--mono);font-size:.8em;background:#fff;border:1px solid var(--line);border-radius:4px;padding:1px 6px;}
+
+  /* ----------------------------------------------------------------- toc */
+  .toc{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-top:28px;}
+  .toc a{display:block;background:#fff;padding:14px 16px;text-decoration:none;font-size:.8125rem;font-weight:600;color:var(--navy-900);}
+  .toc a:hover{background:var(--mist-50);}
+  .toc a small{display:block;font-family:var(--mono);font-weight:400;font-size:.6875rem;letter-spacing:.06em;text-transform:uppercase;color:var(--signal-600);margin-bottom:4px;}
+  @media (max-width:900px){.toc{grid-template-columns:repeat(2,1fr);}}
+
+  /* --------------------------------------------------------------- section header */
+  .sec-head{max-width:64ch;margin-bottom:32px;}
+  .sec-head h2{font-size:clamp(1.375rem,2.6vw,1.875rem);letter-spacing:-0.025em;}
+  .sec-head p{margin-top:8px;color:var(--slate-500);font-size:.9375rem;line-height:1.6;}
+  section[id]{scroll-margin-top:88px;}
+
+  /* -------------------------------------------------------------------- hero mock */
+  .hero-mock{position:relative;background:var(--navy-900);color:#fff;overflow:hidden;}
+  .hero-mock__ph{position:absolute;inset:0;}
+  .hero-mock__scrim{position:absolute;inset:0;background:linear-gradient(90deg, rgba(7,20,38,.94) 0%, rgba(7,20,38,.74) 46%, rgba(7,20,38,.22) 100%);pointer-events:none;}
+  .hero-mock__inner{position:relative;z-index:2;padding:72px 0;display:flex;flex-direction:column;gap:20px;max-width:640px;}
+  .hero-mock h1{font-size:clamp(2.25rem,5vw,3.4rem);line-height:1.03;letter-spacing:-0.04em;}
+  .hero-mock h1 em{font-style:normal;color:rgba(255,255,255,.6);}
+  .hero-mock p.lede{font-size:1.0625rem;color:rgba(255,255,255,.78);max-width:48ch;}
+  .hero-mock .btn-row{display:flex;gap:10px;margin-top:4px;}
+
+  /* --------------------------------------------------------------------- grids */
+  .grid{display:grid;gap:16px;}
+  .grid--2{grid-template-columns:repeat(2,1fr);}
+  .grid--3{grid-template-columns:repeat(3,1fr);}
+  .grid--4{grid-template-columns:repeat(4,1fr);}
+  @media (max-width:900px){.grid--3,.grid--4{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:640px){.grid--2,.grid--3,.grid--4{grid-template-columns:1fr;}}
+
+  .card{display:flex;flex-direction:column;gap:10px;padding:18px;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:0 1px 2px rgb(11 31 58 / .06);}
+  .card h3{font-size:1rem;letter-spacing:-0.01em;}
+  .card p{font-size:.8125rem;color:var(--slate-500);line-height:1.5;}
+
+  /* ------------------------------------------------------------------ dual */
+  .dual{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:800px){.dual{grid-template-columns:1fr;}}
+  .dual__card{display:flex;flex-direction:column;gap:14px;padding:28px;border-radius:var(--r-lg);}
+  .dual__card--sea{background:var(--navy-900);color:#fff;}
+  .dual__card--shore{background:var(--mist-50);border:1px solid var(--line);}
+  .dual__card h3{font-size:1.5rem;}
+  .dual__card--shore .dual__card p{color:var(--slate-500);}
+  .dual__card--sea .dual__card p{color:rgba(255,255,255,.72);}
+  .dual__card .imgph{height:190px;}
+
+  /* --------------------------------------------------------------- band-break */
+  .bandbreak{position:relative;background:var(--navy-900);color:#fff;overflow:hidden;padding-block:0;}
+  .bandbreak .imgph{border-radius:0;border:none;height:340px;}
+  .bandbreak__scrim{position:absolute;inset:0;background:linear-gradient(90deg, rgba(7,20,38,.94) 0%, rgba(7,20,38,.74) 46%, rgba(7,20,38,.22) 100%);}
+  .bandbreak__text{position:relative;z-index:2;padding:56px 0;max-width:52ch;}
+  .bandbreak h2{font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-0.03em;}
+  .bandbreak p{margin-top:10px;color:rgba(255,255,255,.75);font-size:.9375rem;}
+
+  /* ------------------------------------------------------------ interior hero */
+  .ihero{background:var(--navy-900);color:#fff;padding-block:56px;}
+  .ihero__inner{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;}
+  @media (max-width:900px){.ihero__inner{grid-template-columns:1fr;}}
+  .ihero h1{font-size:clamp(1.75rem,3.6vw,2.4rem);letter-spacing:-0.032em;line-height:1.1;}
+  .ihero p.lede{margin-top:12px;color:rgba(255,255,255,.78);font-size:1rem;max-width:44ch;}
+  .ihero .imgph{height:280px;}
+
+  table.spec{width:100%;border-collapse:collapse;margin-top:20px;font-size:.8125rem;}
+  table.spec th,table.spec td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+  table.spec th{font-family:var(--mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);font-weight:500;}
+  table.spec td.num{font-family:var(--mono);color:var(--slate-500);white-space:nowrap;}
+
+  /* -------------------------------------------------------------------- team */
+  .team{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media (max-width:800px){.team{grid-template-columns:1fr;}}
+  .member{border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:#fff;box-shadow:0 1px 2px rgb(11 31 58/.06);}
+  .member .imgph{aspect-ratio:4/5;border-radius:0;border:none;background:repeating-linear-gradient(135deg, var(--navy-800) 0 10px, var(--navy-900) 10px 20px);color:rgba(255,255,255,.7);}
+  .member__body{padding:16px;}
+  .member__body h3{font-size:1rem;}
+  .member__body .role{font-size:.8125rem;color:var(--slate-400);margin-top:2px;}
+
+  /* -------------------------------------------------------------------- logos */
+  .logo-wall{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-tag);overflow:hidden;}
+  @media (max-width:700px){.logo-wall{grid-template-columns:repeat(2,1fr);}}
+  .logo-cell{background:#fff;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px;}
+  .logo-cell strong{font-family:var(--display);font-weight:700;font-size:.85rem;color:var(--navy-900);}
+  .logo-cell span{font-family:var(--mono);font-size:.625rem;letter-spacing:.06em;text-transform:uppercase;color:var(--signal-800);background:var(--signal-50);border:1px solid #f7d9cc;border-radius:var(--r-pill);padding:2px 8px;}
+
+  /* ------------------------------------------------------------------ articles */
+  .lead-post{display:grid;grid-template-columns:1fr;gap:20px;}
+  .lead-post .imgph{aspect-ratio:21/9;height:auto;}
+  .post{padding-top:16px;border-top:2px solid var(--navy-900);}
+  .post .imgph{aspect-ratio:16/9;height:auto;margin-bottom:12px;}
+  .post .cat{font-family:var(--mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);}
+  .post h3{font-size:1.05rem;margin-top:8px;letter-spacing:-0.015em;}
+  .post p{font-size:.8125rem;color:var(--slate-500);margin-top:6px;}
+
+  /* ------------------------------------------------------------------ sectors */
+  .sector-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  @media (max-width:900px){.sector-grid{grid-template-columns:repeat(3,1fr);}}
+  @media (max-width:520px){.sector-grid{grid-template-columns:repeat(2,1fr);}}
+  .sector-tile{aspect-ratio:4/3;}
+  .callout{border-left:3px solid var(--signal-600);background:var(--signal-50);border-radius:0 var(--r-lg) var(--r-lg) 0;padding:16px 18px;font-size:.875rem;color:var(--slate-600);line-height:1.6;margin-top:20px;}
+  .callout strong{color:var(--navy-900);}
+
+  /* ------------------------------------------------------------------ offices */
+  .offices{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media (max-width:800px){.offices{grid-template-columns:1fr;}}
+  .office{border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:#fff;}
+  .office .imgph{aspect-ratio:3/2;border-radius:0;border:none;}
+  .office__body{padding:16px;}
+  .office__body h3{font-size:1.05rem;}
+  .office__body p{font-size:.8125rem;color:var(--slate-400);margin-top:2px;}
+
+  /* --------------------------------------------------------------- credential */
+  .credential{background:var(--navy-900);color:#fff;border-radius:var(--r-lg);padding:28px;display:grid;grid-template-columns:120px 1fr;gap:22px;align-items:start;}
+  @media (max-width:600px){.credential{grid-template-columns:1fr;}}
+  .credential .imgph{width:120px;height:150px;border-radius:6px;}
+  .credential blockquote{margin:0 0 14px;font-size:1rem;line-height:1.55;color:rgba(255,255,255,.9);font-style:italic;}
+  .credential .name{font-weight:700;font-size:.9375rem;}
+  .credential .role{font-size:.8125rem;color:rgba(255,255,255,.6);margin-top:2px;}
+
+  /* ---------------------------------------------------------------- social */
+  .social-card{max-width:420px;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:#fff;box-shadow:0 6px 20px rgb(11 31 58/.1);}
+  .social-card .imgph{aspect-ratio:1200/630;border-radius:0;border:none;}
+  .social-card__body{padding:12px 14px;}
+  .social-card__body .domain{font-family:var(--mono);font-size:.6875rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate-400);}
+  .social-card__body h4{font-size:.9375rem;margin-top:4px;}
+  .social-card__body p{font-size:.8125rem;color:var(--slate-500);margin-top:2px;}
+
+  /* ----------------------------------------------------------------- footer */
+  .mock-footer{background:var(--navy-950);color:rgba(255,255,255,.5);padding:28px 0;font-family:var(--mono);font-size:.75rem;letter-spacing:.04em;text-align:center;}
+
+  /* --------------------------------------------------------------- misc */
+  .note{font-size:.8125rem;color:var(--slate-400);margin-top:16px;line-height:1.6;}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
+  @media (max-width:800px){.split{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ============================================================= ICON DEFS -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="icon-image" viewBox="0 0 24 24" fill="none">
+    <rect x="2.5" y="4.5" width="19" height="15" rx="2" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="8" cy="10" r="1.6" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M4 17l5-5 3.5 3.5L16 12l4.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>
+
+<!-- ================================================================ HEADER -->
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="#top"><span class="brand__mark"></span><span class="brand__name">Nevoxel</span></a>
+    <nav class="mock-nav">
+      <span class="is-current">For Employers</span><span>For Candidates</span><span>About</span><span>Insights</span><span>Contact</span>
+    </nav>
+    <div class="mock-actions">
+      <a class="btn btn--navy" href="#">Find jobs</a>
+      <a class="btn btn--solid" href="#">Hire talent</a>
+    </div>
+  </div>
+</header>
+
+<!-- ================================================================== COVER -->
+<div class="cover" id="top">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--signal-400)">Presentation mockup · for creative director / photographer</span>
+    <h1>Where photography goes on nevoxel.com</h1>
+    <p>This is a working mockup of the real site — same layout, same type, same colour system — with every open image slot marked as a dashed placeholder. Each box carries its reference number, the exact pixel size it renders at, its crop ratio, and a one-line subject brief. Full sourcing notes, licensing rules and Harbour treatment specs are in the companion document, <strong style="color:#fff">Image Placement Sheet.md</strong>, in this same folder.</p>
+    <div class="cover-meta">
+      <span>13 slot types</span>
+      <span>42 photographs</span>
+      <span>7 vector logos</span>
+      <span>All 36 routes covered</span>
+    </div>
+  </div>
+</div>
+
+<!-- =================================================================== TOC -->
+<div class="wrap" style="padding-top:28px;">
+  <div class="legend">
+    <div class="imgph">
+      <svg class="icon-frame" style="width:30px;height:30px;"><use href="#icon-image"/></svg>
+      <div class="imgph__label">Attach image here</div>
+      <div class="imgph__meta">S0 · 16:9 · 2000×1125px</div>
+      <div class="imgph__brief">One-line subject brief goes here, describing what to shoot or source.</div>
+    </div>
+    <div class="legend-copy">
+      <h3>How to read this file</h3>
+      <p>Every dashed box is an open slot. The orange tag above a section is its <strong>Slot ID</strong> — cross-reference it in the Image Placement Sheet for the full brief, licensing notes and Harbour treatment rules (navy scrim, radius, alt-text convention).</p>
+      <p>Sizes shown are the <em>minimum source resolution</em> to deliver — double the on-screen size, so images stay sharp on retina displays. Everything else on this page (type, colour, buttons, layout) is the real, shipped design — nothing here needs sign-off except the images themselves.</p>
+      <p>Jump to any section: <code>#s1</code> – <code>#s13</code></p>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <a href="#s1"><small>S1</small>Home hero background</a>
+    <a href="#s8"><small>S8</small>Dual-path doors</a>
+    <a href="#s7"><small>S7</small>Service cards</a>
+    <a href="#s10"><small>S10</small>Section break</a>
+    <a href="#s2"><small>S2</small>Interior page-hero</a>
+    <a href="#s3"><small>S3</small>Team portraits</a>
+    <a href="#s4"><small>S4</small>Client logos</a>
+    <a href="#s5"><small>S5 / S6</small>Article covers</a>
+    <a href="#s9"><small>S9</small>Sector tiles</a>
+    <a href="#s11"><small>S11</small>Office photos</a>
+    <a href="#s12"><small>S12</small>Leadership credential</a>
+    <a href="#s13"><small>S13</small>Social share image</a>
+  </nav>
+</div>
+
+<!-- ================================================================ S1 HOME HERO -->
+<section id="s1" class="hero-mock" style="margin-top:56px;">
+  <div class="hero-mock__ph imgph imgph--dark imgph--corner" style="border-radius:0;border:none;">
+    <svg class="icon-frame" style="width:26px;height:26px;"><use href="#icon-image"/></svg>
+    <div class="imgph__label">Attach image here</div>
+    <div class="imgph__meta">S1 · Home hero background</div>
+  </div>
+  <div class="hero-mock__scrim"></div>
+  <div class="wrap hero-mock__inner">
+    <span class="slot-tag" style="background:transparent;border-color:rgba(255,138,71,.4);color:var(--signal-400)">S1 · 16:9 · min 2560×1440px</span>
+    <h1>Steering<br>maritime talent<br><em>from sea</em> to shore</h1>
+    <p class="lede">Shore-based maritime recruitment since 2008. We move proven officers, engineers and commercial specialists into shore roles — and stay with them through the first year.</p>
+    <div class="btn-row">
+      <a class="btn btn--inverse" href="#">Find jobs</a>
+      <a class="btn btn--solid" href="#">Hire talent</a>
+    </div>
+  </div>
+</section>
+<div class="wrap">
+  <p class="note"><strong>Brief:</strong> real vessel alongside at a working berth, golden hour, no text in frame. Product tanker, bulker or gas carrier — not a container ship. Keep the visually quiet part of the frame on the left third (where the scrim is darkest and the headline sits); let detail — bridge, cranes, mooring lines — fall right of centre.</p>
+</div>
+
+<!-- ================================================================ S8 DUAL DOORS -->
+<section id="s8" class="band">
+  <div class="wrap">
+    <span class="slot-tag">S8 · 16:9 · min 1600×900px each · 2 images</span>
+    <div class="sec-head">
+      <h2>Which way are you heading?</h2>
+      <p>The two-door rule made visible — the sea/shore contrast between these two frames is the whole point. Shoot or select them as a matched pair, not separately.</p>
+    </div>
+    <div class="dual">
+      <div class="dual__card dual__card--sea">
+        <h3>I want a job <em style="color:rgba(255,255,255,.6);font-style:normal;">ashore</em></h3>
+        <div class="imgph imgph--dark">
+          <svg class="icon-frame" style="width:26px;height:26px;"><use href="#icon-image"/></svg>
+          <div class="imgph__label">Attach image here</div>
+          <div class="imgph__meta">S8a · Crew at work</div>
+          <div class="imgph__brief">Crew at work at sea — PPE, daylight, candid. The life being left.</div>
+        </div>
+      </div>
+      <div class="dual__card dual__card--shore">
+        <h3>I want to hire</h3>
+        <div class="imgph">
+          <svg class="icon-frame" style="width:26px;height:26px;"><use href="#icon-image"/></svg>
+          <div class="imgph__label">Attach image here</div>
+          <div class="imgph__meta">S8b · Shore office</div>
+          <div class="imgph__brief">A shore office or terminal operations room. The place being joined.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ S7 SERVICE CARDS -->
+<section id="s7" class="band band--mist">
+  <div class="wrap">
+    <span class="slot-tag">S7 · 3:2 · min 900×600px · 5 subjects, reused across 3 pages</span>
+    <div class="sec-head">
+      <h2>Four desks, one specialism</h2>
+      <p>Small format — one clear object or figure, no wide vistas. Also appears as 3 cards on /employers and 2 on /candidates.</p>
+    </div>
+    <div class="grid grid--4">
+      <div class="card">
+        <div class="imgph imgph--sm" style="aspect-ratio:3/2;"><svg class="icon-frame" style="width:20px;height:20px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image</div><div class="imgph__meta">S7 · Officer recruitment</div></div>
+        <h3>Maritime shore recruitment</h3>
+        <p>Superintendents, operations, chartering, crewing and HSEQ.</p>
+      </div>
+      <div class="card">
+        <div class="imgph imgph--sm" style="aspect-ratio:3/2;"><svg class="icon-frame" style="width:20px;height:20px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image</div><div class="imgph__meta">S7 · Executive search</div></div>
+        <h3>Executive search</h3>
+        <p>CXO and senior appointments, usually confidential.</p>
+      </div>
+      <div class="card">
+        <div class="imgph imgph--sm" style="aspect-ratio:3/2;"><svg class="icon-frame" style="width:20px;height:20px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image</div><div class="imgph__meta">S7 · HR advisory</div></div>
+        <h3>HR advisory (NECD)</h3>
+        <p>Wellness, training and TMSA-aligned HR practice.</p>
+      </div>
+      <div class="card">
+        <div class="imgph imgph--sm" style="aspect-ratio:3/2;"><svg class="icon-frame" style="width:20px;height:20px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image</div><div class="imgph__meta">S7 · Sea2Shore</div></div>
+        <h3>Sea2Shore</h3>
+        <p>Our transition programme for seafarers coming ashore.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ S10 SECTION BREAK -->
+<section id="s10" class="bandbreak">
+  <div class="imgph imgph--dark imgph--corner" style="border-radius:0;border:none;height:auto;position:absolute;inset:0;">
+    <svg class="icon-frame" style="width:26px;height:26px;"><use href="#icon-image"/></svg>
+    <div class="imgph__label">Attach image here</div>
+    <div class="imgph__meta">S10 · Full-bleed section break</div>
+  </div>
+  <div class="bandbreak__scrim"></div>
+  <div class="wrap bandbreak__text">
+    <span class="slot-tag" style="background:transparent;border-color:rgba(255,138,71,.4);color:var(--signal-400)">S10 · 21:9 · min 2400×1030px · 4 uses</span>
+    <h2>Seventeen years on one desk</h2>
+    <p>Wide port or anchorage, horizon-led, calm. This treatment repeats 4 times — on /, /employers, /candidates/sea2shore and /about — each with a different photo, same scrim.</p>
+  </div>
+</section>
+
+<!-- ================================================================ S2 INTERIOR HERO -->
+<section id="s2" class="ihero">
+  <div class="wrap ihero__inner">
+    <div>
+      <span class="slot-tag" style="background:transparent;border-color:rgba(255,138,71,.4);color:var(--signal-400)">S2 · 3:2 · min 1440×960px · 9 pages</span>
+      <h1>Hire proven shore-based maritime talent</h1>
+      <p class="lede">This is the interior page-hero pattern. It repeats — same slot, same size — on nine destination pages. The slot already exists in code and costs nothing to fill; it is simply empty on every page today.</p>
+    </div>
+    <div class="imgph imgph--dark">
+      <svg class="icon-frame" style="width:28px;height:28px;"><use href="#icon-image"/></svg>
+      <div class="imgph__label">Attach image here</div>
+      <div class="imgph__meta">S2 · Interior hero aside</div>
+      <div class="imgph__brief">One distinct photo per page — see the brief list below.</div>
+    </div>
+  </div>
+</section>
+<div class="wrap" style="padding-block:32px;">
+  <table class="spec">
+    <thead><tr><th>Page</th><th>Subject brief</th></tr></thead>
+    <tbody>
+      <tr><td>/employers</td><td>Shore office in use — fleet-monitoring screen or a whiteboarded vessel schedule.</td></tr>
+      <tr><td>/employers/maritime-recruitment</td><td>Superintendent on deck or in an engine room with PPE, mid-inspection.</td></tr>
+      <tr><td>/employers/executive-search</td><td>Quiet senior setting — small meeting room, two people, no handshake.</td></tr>
+      <tr><td>/employers/hr-advisory</td><td>Training or briefing session with crew or shore staff, seated, daylight.</td></tr>
+      <tr><td>/candidates</td><td>Officer ashore in office clothes — the transition itself. Avoid uniform.</td></tr>
+      <tr><td>/candidates/sea2shore</td><td>Clearest sea-to-shore frame available: gangway, quayside, officer with a bag leaving a vessel.</td></tr>
+      <tr><td>/candidates/resume-coaching</td><td>Someone working through a document with another person, over-shoulder.</td></tr>
+      <tr><td>/about</td><td>The Mumbai team at work, or the office itself.</td></tr>
+      <tr><td>/contact</td><td>Mumbai port or the Thane office exterior — a real, locatable place.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ================================================================ S3 TEAM -->
+<section id="s3" class="band band--mist">
+  <div class="wrap">
+    <span class="slot-tag">S3 · 4:5 · min 1200×1500px · 3 portraits</span>
+    <div class="sec-head">
+      <h2>Who you will actually work with</h2>
+      <p>Neutral wall, eye-level, natural light. The one rule that matters most: the crop must be <strong>identical across all three</strong> — same distance, same eye height, same background.</p>
+    </div>
+    <div class="team">
+      <div class="member">
+        <div class="imgph"><svg class="icon-frame" style="width:26px;height:26px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image here</div><div class="imgph__meta">neetu-jaiswal.webp</div></div>
+        <div class="member__body"><h3>Neetu Jaiswal</h3><p class="role">Founder &amp; Chief Executive</p></div>
+      </div>
+      <div class="member">
+        <div class="imgph"><svg class="icon-frame" style="width:26px;height:26px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image here</div><div class="imgph__meta">rajesh-menon.webp</div></div>
+        <div class="member__body"><h3>Rajesh Menon</h3><p class="role">Advisor &amp; Wellness Coach</p></div>
+      </div>
+      <div class="member">
+        <div class="imgph"><svg class="icon-frame" style="width:26px;height:26px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image here</div><div class="imgph__meta">surangama-sharma.webp</div></div>
+        <div class="member__body"><h3>Adv. Surangama Sharma</h3><p class="role">Legal Advisor</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ S4 CLIENT LOGOS -->
+<section id="s4" class="band">
+  <div class="wrap">
+    <span class="slot-tag">S4 · vector · ≤120×32px optical · 7 logos</span>
+    <div class="sec-head">
+      <h2>Placed talent with</h2>
+      <p>Single-colour SVG only — a bitmap logo will look broken beside the others. <strong>Blocked on permission:</strong> each mark needs written sign-off and the company's own artwork before use.</p>
+    </div>
+    <div class="logo-wall">
+      <div class="logo-cell"><strong>Mitsui O.S.K.</strong><span>Logo file needed</span></div>
+      <div class="logo-cell"><strong>TORM</strong><span>Logo file needed</span></div>
+      <div class="logo-cell"><strong>Aditya Birla</strong><span>Logo file needed</span></div>
+      <div class="logo-cell"><strong>Scorpio</strong><span>Logo file needed</span></div>
+      <div class="logo-cell"><strong>Navig8</strong><span>Logo file needed</span></div>
+      <div class="logo-cell"><strong>ATPI</strong><span>Logo file needed</span></div>
+      <div class="logo-cell"><strong>MTM</strong><span>Logo file needed</span></div>
+      <div class="logo-cell" style="background:var(--mist-50);"><span style="background:transparent;border:none;color:var(--slate-400);font-size:.6875rem;">+ more as clients are added</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ S5/S6 ARTICLES -->
+<section id="s5" class="band band--mist">
+  <div class="wrap">
+    <span class="slot-tag">S5 · 16:9 · min 1600×900px · 5 covers &nbsp;·&nbsp; S6 · 21:9 lead crop, reuses S5</span>
+    <div class="sec-head">
+      <h2>Notes from the shore-side market</h2>
+      <p>One cover image per article. The lead post on the blog index (S6) is a 21:9 crop of the same file — no separate asset needed.</p>
+    </div>
+
+    <div class="lead-post" style="margin-bottom:28px;">
+      <div class="imgph"><svg class="icon-frame" style="width:28px;height:28px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image here</div><div class="imgph__meta">S6 · Lead post crop of reading-a-sea-cv.webp</div></div>
+      <div>
+        <span class="cat" style="font-family:var(--mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-400);">For Employers</span>
+        <h3 style="font-size:1.375rem;margin-top:6px;">How to read a sea CV when you have never been to sea</h3>
+        <p style="margin-top:6px;color:var(--slate-500);font-size:.875rem;">Hiring managers reject strong maritime candidates for the wrong reasons. Most of it comes down to four lines on a CV that shore readers misinterpret.</p>
+      </div>
+    </div>
+
+    <div class="grid grid--3">
+      <div class="post">
+        <div class="imgph imgph--sm"><svg class="icon-frame" style="width:20px;height:20px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image</div><div class="imgph__meta">first-year-ashore.webp</div></div>
+        <span class="cat">For Candidates</span>
+        <h3>The first year ashore is where placements fail</h3>
+        <p>Technical skills transfer cleanly. Office politics, salary structure and the loss of rank do not.</p>
+      </div>
+      <div class="post">
+        <div class="imgph imgph--sm"><svg class="icon-frame" style="width:20px;height:20px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image</div><div class="imgph__meta">shore-hiring-market-2026.webp</div></div>
+        <span class="cat">Market</span>
+        <h3>Shore-side hiring in 2026: three things moving the market</h3>
+        <p>Decarbonisation roles, the officer shortage, and what confidential mandates now cost in time.</p>
+      </div>
+      <div class="post">
+        <div class="imgph imgph--sm"><svg class="icon-frame" style="width:20px;height:20px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image</div><div class="imgph__meta">women-in-maritime-shore-roles.webp</div></div>
+        <span class="cat">Industry</span>
+        <h3>Where women are actually being hired in maritime</h3>
+        <p>Shore-side roles have opened faster than seagoing ones. The pipeline data shows where the blockages sit.</p>
+      </div>
+    </div>
+    <p class="note">A fifth cover — <strong>confidential-search-explained.webp</strong> — is needed for the article not shown in this 3-up preview. Brief: something quiet and closed, a shut door or empty meeting room.</p>
+  </div>
+</section>
+
+<!-- ================================================================ S9 SECTORS -->
+<section id="s9" class="band">
+  <div class="wrap">
+    <span class="slot-tag">S9 · 4:3 · min 800×600px · 9 tiles — flagged, see note</span>
+    <div class="sec-head">
+      <h2>Maritime first, adjacent where the skills transfer</h2>
+      <p>Optional. The shipped design renders sectors as plain text tags, not photo tiles — this treatment is a deliberate departure, shown here so it can be judged visually before committing to nine more photographs.</p>
+    </div>
+    <div class="sector-grid">
+      <div class="imgph imgph--sm sector-tile"><svg class="icon-frame" style="width:18px;height:18px;"><use href="#icon-image"/></svg><div class="imgph__label">Maritime</div></div>
+      <div class="imgph imgph--sm sector-tile"><svg class="icon-frame" style="width:18px;height:18px;"><use href="#icon-image"/></svg><div class="imgph__label">Logistics</div></div>
+      <div class="imgph imgph--sm sector-tile"><svg class="icon-frame" style="width:18px;height:18px;"><use href="#icon-image"/></svg><div class="imgph__label">Energy</div></div>
+      <div class="imgph imgph--sm sector-tile"><svg class="icon-frame" style="width:18px;height:18px;"><use href="#icon-image"/></svg><div class="imgph__label">Manufacturing</div></div>
+      <div class="imgph imgph--sm sector-tile"><svg class="icon-frame" style="width:18px;height:18px;"><use href="#icon-image"/></svg><div class="imgph__label">BFSI</div></div>
+      <div class="imgph imgph--sm sector-tile"><svg class="icon-frame" style="width:18px;height:18px;"><use href="#icon-image"/></svg><div class="imgph__label">Pharma</div></div>
+      <div class="imgph imgph--sm sector-tile"><svg class="icon-frame" style="width:18px;height:18px;"><use href="#icon-image"/></svg><div class="imgph__label">Technology</div></div>
+      <div class="imgph imgph--sm sector-tile"><svg class="icon-frame" style="width:18px;height:18px;"><use href="#icon-image"/></svg><div class="imgph__label">IT</div></div>
+      <div class="imgph imgph--sm sector-tile"><svg class="icon-frame" style="width:18px;height:18px;"><use href="#icon-image"/></svg><div class="imgph__label">Finance</div></div>
+    </div>
+    <div class="callout"><strong>Lower-risk alternative:</strong> keep the nine sectors as plain text chips (as shipped) and add one S10-style 21:9 band above them instead — one photo instead of nine, no departure from the design system.</div>
+  </div>
+</section>
+
+<!-- ================================================================ S11 OFFICES -->
+<section id="s11" class="band band--mist">
+  <div class="wrap">
+    <span class="slot-tag">S11 · 3:2 · min 1200×800px · 3 offices</span>
+    <div class="sec-head">
+      <h2>Three offices across India</h2>
+      <p>Real interiors or building exteriors. A recognisable, locatable place beats a tidy stock office — the live page already carries a map embed of these addresses.</p>
+    </div>
+    <div class="offices">
+      <div class="office">
+        <div class="imgph"><svg class="icon-frame" style="width:22px;height:22px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image here</div><div class="imgph__meta">mumbai.webp</div></div>
+        <div class="office__body"><h3>Mumbai</h3><p>Head office</p></div>
+      </div>
+      <div class="office">
+        <div class="imgph"><svg class="icon-frame" style="width:22px;height:22px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image here</div><div class="imgph__meta">delhi-noida.webp</div></div>
+        <div class="office__body"><h3>Delhi / Noida</h3><p>North India desk</p></div>
+      </div>
+      <div class="office">
+        <div class="imgph"><svg class="icon-frame" style="width:22px;height:22px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image here</div><div class="imgph__meta">lucknow.webp</div></div>
+        <div class="office__body"><h3>Lucknow</h3><p>Sourcing centre</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ S12 CREDENTIAL -->
+<section id="s12" class="band">
+  <div class="wrap">
+    <span class="slot-tag">S12 · 4:5 · reuses S3 portrait · 0 new assets</span>
+    <div class="sec-head">
+      <h2>Leadership credential</h2>
+      <p>Harbour's device for making the experience claim concrete. Reuses Neetu Jaiswal's team portrait — no separate photography needed.</p>
+    </div>
+    <div class="credential">
+      <div class="imgph imgph--dark"><svg class="icon-frame" style="width:22px;height:22px;"><use href="#icon-image"/></svg><div class="imgph__label" style="font-size:.7rem;">Reuses S3</div></div>
+      <div>
+        <blockquote>— pull quote goes here, copy TBD, not part of this image brief —</blockquote>
+        <div class="name">Neetu Jaiswal</div>
+        <div class="role">Founder &amp; Chief Executive</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ S13 SOCIAL -->
+<section id="s13" class="band band--mist">
+  <div class="wrap">
+    <span class="slot-tag">S13 · 1.91:1 · exactly 1200×630px · site-wide default</span>
+    <div class="sec-head">
+      <h2>Social share image</h2>
+      <p>Currently missing sitewide — every link shared to LinkedIn or WhatsApp today renders with no picture at all. This one needs no photography: navy field, wordmark, tagline is enough to fix it. Shown below as it would appear in a share preview.</p>
+    </div>
+    <div class="social-card">
+      <div class="imgph imgph--dark" style="border-radius:0;"><svg class="icon-frame" style="width:26px;height:26px;"><use href="#icon-image"/></svg><div class="imgph__label">Attach image here</div><div class="imgph__meta">S13 · 1200×630px</div></div>
+      <div class="social-card__body">
+        <div class="domain">nevoxel.com</div>
+        <h4>Nevoxel — Steering Maritime Talent</h4>
+        <p>Shore-based maritime recruitment since 2008.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== FOOTER -->
+<footer class="mock-footer">
+  Nevoxel · Image Placeholder Mockup · presentation copy, not for production use · see Image Placement Sheet.md for full specs
+</footer>
+
+</body>
+</html>

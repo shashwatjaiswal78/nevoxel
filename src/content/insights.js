@@ -13,6 +13,8 @@
 const posts = [
   {
     slug: 'reading-a-sea-cv',
+    // Files: /assets/img/post/<slug>.webp (3:2 master) and <slug>-card.webp (16:9, 800w).
+    cover: { alt: 'A printed CV and a certificate on a desk beside reading glasses and a pen' },
     title: 'How to read a sea CV when you have never been to sea',
     dek: 'Hiring managers reject strong maritime candidates for the wrong reasons. Most of it comes down to four lines on a CV that shore readers misinterpret.',
     date: '2026-07-21',
@@ -29,6 +31,7 @@ const posts = [
   },
   {
     slug: 'first-year-ashore',
+    cover: { alt: 'A single person working at a desk in a large, mostly empty open-plan office' },
     title: 'The first year ashore is where placements fail',
     dek: 'Technical skills transfer cleanly. Office politics, salary structure and the loss of rank do not. What actually derails a move ashore.',
     date: '2026-07-07',
@@ -45,6 +48,7 @@ const posts = [
   },
   {
     slug: 'shore-hiring-market-2026',
+    cover: { alt: 'A line of gantry cranes along a container terminal with a vessel alongside' },
     title: 'Shore-side hiring in 2026: three things moving the market',
     dek: 'Decarbonisation roles, the officer shortage pushing shore packages up, and what confidential mandates now cost in time.',
     date: '2026-06-18',
@@ -61,6 +65,7 @@ const posts = [
   },
   {
     slug: 'women-in-maritime-shore-roles',
+    cover: { alt: 'A woman in a hard hat and high-visibility vest checking equipment on a tablet at a container terminal' },
     title: 'Where women are actually being hired in maritime — and where they are not',
     dek: 'Shore-side roles have opened faster than seagoing ones. The pipeline data shows exactly where the remaining blockages sit.',
     date: '2026-05-29',

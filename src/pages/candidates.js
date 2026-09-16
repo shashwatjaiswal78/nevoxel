@@ -46,21 +46,24 @@ const overview = {
   priority: '0.9',
   render() {
     const hero = C.pageHero({
-      eyebrow: 'For candidates',
-      coord: 'Course 1',
       title: 'Take your maritime career <em>ashore</em>',
       lede: 'You have the sea time. The hard part is getting a shore-side hiring manager to read it properly. That is the part we do — then we stay with you through the first year, which is where these moves are actually won or lost.',
       actions: [
         C.btn('Browse jobs', '/jobs', { variant: 'solid', icon: true }),
         C.btn('Get resume help', '/candidates/resume-coaching', { variant: 'ghost', icon: true }),
       ],
+      image: {
+        src: '/assets/img/hero/candidates.webp',
+        alt: 'Merchant navy officer holding a document folder outside a port office building',
+        width: 1536,
+        height: 1024,
+      },
     });
 
     const preview = C.band({
       tone: 'paper',
       coast: true,
       body: `    ${C.sectionHead({
-        eyebrow: 'Open roles',
         title: 'What is live right now',
         lede: 'Every role on our board is a real mandate we are working. Filter by function, sector or location.',
       })}
@@ -76,7 +79,6 @@ const overview = {
     const programmes = C.band({
       tone: 'paper-alt',
       body: `    ${C.sectionHead({
-        eyebrow: 'Support',
         title: 'Two things we do before you apply',
         lede: 'Both are free to candidates. Our fees are paid by employers.',
       })}
@@ -104,7 +106,6 @@ const overview = {
       body: `    <div class="split">
       <div>
         ${C.sectionHead({
-          eyebrow: 'Why it works',
           title: 'We argue your case in writing',
           lede: 'Every candidate we put forward goes with a written note explaining how their sea experience maps to the shore role — because the hiring manager reading it has probably never been aboard.',
         })}
@@ -122,7 +123,6 @@ const overview = {
     const faq = C.band({
       tone: 'paper',
       body: `    ${C.sectionHead({
-        eyebrow: 'Questions',
         title: 'What candidates ask us first',
       })}
     ${C.accordion(candidateFaq, { name: 'candidate-faq' })}`,
@@ -192,13 +192,18 @@ const sea2shore = {
   priority: '0.8',
   render() {
     const hero = C.pageHero({
-      eyebrow: 'Transition programme',
       title: 'Sea2Shore',
       lede: 'A structured route from <em>the last contract</em> to the first shore year. Built because we watched too many good officers make the move badly and go back to sea within eighteen months.',
       actions: [
         C.btn('Start the conversation', '/contact?for=candidate', { variant: 'solid', icon: true }),
         C.btn('See open roles', '/jobs', { variant: 'ghost', icon: true }),
       ],
+      image: {
+        src: '/assets/img/hero/sea2shore.webp',
+        alt: 'Merchant navy officer with a kit bag walking down a gangway onto the quayside',
+        width: 1536,
+        height: 1024,
+      },
     });
 
     const what = C.band({
@@ -206,7 +211,6 @@ const sea2shore = {
       coast: true,
       body: `    <div class="split">
       <div data-motion="rise">
-        ${C.eyebrow('What it is')}
         <p class="lede-lg">Four stages, running from before you sign off to a year after you start ashore.</p>
       </div>
       <div class="prose" data-motion="rise">
@@ -219,7 +223,6 @@ const sea2shore = {
     const stages = C.band({
       tone: 'paper-alt',
       body: `    ${C.sectionHead({
-        eyebrow: 'The programme',
         title: 'Four stages',
       })}
     ${C.processTimeline([
@@ -251,7 +254,6 @@ const sea2shore = {
       body: `    <div class="split">
       <div>
         ${C.sectionHead({
-          eyebrow: 'Straight talk',
           title: 'What nobody tells you about the first year',
         })}
       </div>
@@ -266,7 +268,7 @@ const sea2shore = {
 
     const faq = C.band({
       tone: 'paper',
-      body: `    ${C.sectionHead({ eyebrow: 'Questions', title: 'About the programme' })}
+      body: `    ${C.sectionHead({ title: 'About the programme' })}
     ${C.accordion(sea2shoreFaq, { name: 's2s-faq' })}`,
     });
 
@@ -302,7 +304,6 @@ const resumeCoaching = {
   priority: '0.8',
   render() {
     const hero = C.pageHero({
-      eyebrow: 'Free to candidates',
       title: 'Resume help & coaching',
       lede: 'Your CV is not weak. It is written for a manning agent, and it is being read by someone who has never seen an engine room. We fix the translation, then prepare you for the interview.',
       actions: [
@@ -316,7 +317,6 @@ const resumeCoaching = {
       coast: true,
       body: `    <div class="split">
       <div data-motion="rise">
-        ${C.eyebrow('The problem')}
         <p class="lede-lg">Four things on a sea CV that shore readers get wrong every time.</p>
       </div>
       <div class="prose" data-motion="rise">
@@ -331,7 +331,6 @@ const resumeCoaching = {
     const whatYouGet = C.band({
       tone: 'paper-alt',
       body: `    ${C.sectionHead({
-        eyebrow: 'What you get',
         title: 'Three sessions, no charge',
         lede: 'Our fees come from employers. This is part of working with us, not a product we sell.',
       })}
@@ -362,7 +361,6 @@ const resumeCoaching = {
       body: `    <div class="split">
       <div>
         ${C.sectionHead({
-          eyebrow: 'Before you send it',
           title: 'A quick self-check',
           lede: 'If you would rather do this yourself, these are the five things we change most often.',
         })}

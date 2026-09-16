@@ -2,3 +2,8 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# Raw source material — originals, third-party references and personal photos.
+# The site uses the optimised copies in src/assets/img/.
+Image Assets/
+References/

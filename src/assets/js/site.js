@@ -152,10 +152,22 @@
 
       // Deep link: /contact?for=employer preselects the employer path, which
       // is what the "Hire talent" button in the header uses.
-      var wanted = new URLSearchParams(window.location.search).get('for');
+      var params = new URLSearchParams(window.location.search);
+      var wanted = params.get('for');
       if (wanted && ROUTING[wanted]) {
         var target = form.querySelector('input[name="segment"][value="' + wanted + '"]');
         if (target) target.checked = true;
+      }
+
+      // /contact?desk=legal prefills the desk select, so a CTA on a vertical
+      // hub carries its context across. Validated against the options actually
+      // present rather than a second hardcoded list.
+      var desk = params.get('desk');
+      var deskSelect = form.querySelector('[data-desk-select]');
+      if (desk && deskSelect) {
+        Array.prototype.forEach.call(deskSelect.options, function (option) {
+          if (option.value === desk) deskSelect.value = desk;
+        });
       }
 
       var checked = form.querySelector('input[name="segment"]:checked');

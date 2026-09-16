@@ -130,12 +130,22 @@ function footer() {
       <a class="brand brand--footer" href="/">
         <img class="brand__logo" src="/assets/img/logo/nevoxel-logo-white.png" alt="Nevoxel — Steering Maritime Talent" width="960" height="230">
       </a>
-      <p class="footer__blurb">Shore-based maritime recruitment since 2008. We move proven maritime, logistics and energy professionals from <em>sea</em> to shore — and stay with them through the first year.</p>
+      <p class="footer__blurb">Shore-based recruitment since 2008. Three specialist desks — maritime, logistics and legal — and we stay with a placement through the <em>first year</em>.</p>
       <ul class="footer__social">
         <li><a href="${attr(site.social.linkedin)}" rel="me noopener">LinkedIn</a></li>
         <li><a href="${attr(site.social.instagram)}" rel="me noopener">Instagram</a></li>
       </ul>
     </div>
+
+    <nav class="footer__col" aria-label="Expertise">
+      <h2 class="footer__head">Expertise</h2>
+      <ul>
+        <li><a href="/maritime">Maritime</a></li>
+        <li><a href="/logistics">Logistics</a></li>
+        <li><a href="/legal">Legal</a></li>
+        <li><a href="/expertise">All desks</a></li>
+      </ul>
+    </nav>
 
     <nav class="footer__col" aria-label="For candidates">
       <h2 class="footer__head">For candidates</h2>
@@ -218,6 +228,76 @@ function organisationSchema() {
   };
 }
 
+/* --------------------------------------------------------- breadcrumb schema */
+
+/**
+ * URL -> label, and child URL -> parent group, both read off the nav. The site
+ * has three axes now (audience, service, practice vertical) and two-level
+ * URLs, so a trail is worth having — but it should never be a third list to
+ * maintain. Anything not in the nav (a job, an article) falls back to its slug.
+ */
+const NAV_LABEL = new Map();
+const NAV_PARENT = new Map();
+
+for (const item of nav) {
+  NAV_LABEL.set(item.url, item.label);
+  for (const child of item.children || []) {
+    // An "Overview" child points at the group's own URL. It is not a separate
+    // place, so it neither relabels the group ("For Employers", not "Overview")
+    // nor becomes its own child of it.
+    if (child.url === item.url) continue;
+    NAV_LABEL.set(child.url, child.label);
+    NAV_PARENT.set(child.url, item);
+  }
+}
+
+const titleise = (slug) =>
+  slug.replace(/-/g, ' ').replace(/(^|\s)\w/g, (c) => c.toUpperCase());
+
+function breadcrumbSchema(url, title) {
+  // A one-item trail says nothing, and the 404 is not part of the hierarchy.
+  if (url === '/' || url === '/404') return null;
+
+  const segments = url.split('/').filter(Boolean);
+  const crumbs = [{ name: 'Home', url: `${site.origin}/` }];
+
+  // A vertical hub lives at the top level (/legal, not /expertise/legal) but
+  // belongs under Expertise in the hierarchy. The nav knows that; the URL does
+  // not. Only top-level pages need this — deeper URLs carry their parent in
+  // the path already.
+  const parent = segments.length === 1 ? NAV_PARENT.get(url) : null;
+  if (parent) crumbs.push({ name: parent.label, url: `${site.origin}${parent.url}/` });
+
+  let path = '';
+  segments.forEach((segment, i) => {
+    path += `/${segment}`;
+    const isLast = i === segments.length - 1;
+
+    // Not every path prefix is a page. /insights/blog exists; /insights does
+    // not, and a crumb pointing at a 404 is worse than a shorter trail.
+    if (!isLast && !NAV_LABEL.has(path)) return;
+
+    // The nav label is the short human name; `title` is the SEO title and is
+    // usually too long for a trail. Prefer the label, fall back to the title
+    // for pages the nav does not list (a job, an article).
+    crumbs.push({
+      name: NAV_LABEL.get(path) || (isLast ? title : titleise(segment)),
+      url: `${site.origin}${path}/`,
+    });
+  });
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: c.url,
+    })),
+  };
+}
+
 /* --------------------------------------------------------------------- page */
 
 /**
@@ -236,7 +316,11 @@ function page(o) {
     o.url === '/' ? `${site.name} — ${site.tagline}` : `${o.title} — ${site.name}`;
   const canonical = `${site.origin}${o.url === '/' ? '/' : o.url + '/'}`;
 
-  const blocks = [organisationSchema(), ...(o.jsonld || [])];
+  const blocks = [
+    organisationSchema(),
+    breadcrumbSchema(o.url, o.title),
+    ...(o.jsonld || []),
+  ].filter(Boolean);
   const jsonldTags = blocks
     .map(
       (b) =>
@@ -277,7 +361,8 @@ function page(o) {
   <link rel="apple-touch-icon" sizes="180x180" href="${FAVICON_BASE}/apple-touch-icon.png">
   <!-- Harbour's three families are self-hosted via @font-face in site.css —
        no external font host. Display and body are preloaded; the mono cut is
-       only used for eyebrows and can arrive late. -->
+       only used for small labels, dates and reference numbers, so it can
+       arrive late. -->
   <link rel="preload" href="/assets/fonts/PlusJakartaSans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Onest-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/site.css">
@@ -301,6 +386,7 @@ ${o.main}
 ${footer()}
 <script src="/assets/js/motion.js" defer></script>
 <script src="/assets/js/site.js" defer></script>
+<script src="/assets/js/logo-cloud.js" defer></script>
 ${extraScripts}
 </body>
 </html>

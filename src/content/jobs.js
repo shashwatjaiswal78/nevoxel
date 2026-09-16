@@ -14,6 +14,13 @@
  *   sector / func / seniority / location  -> drive the filter UI
  *   posted / closes                       -> ISO dates, used by JobPosting schema
  *   salary                                -> omit entirely if not advertised
+ *
+ * ONE SECTOR PER ROLE. `sector` names the desk that runs the mandate, not the
+ * client's industry — so a General Counsel role at a shipping company is
+ * `sector: 'Legal'`, not 'Maritime'. The practice hubs (/maritime, /logistics,
+ * /legal) each list the roles matching their own sector, so a role filed twice
+ * would appear twice and a role filed wrongly would be invisible to its desk.
+ * `func` stays free to describe the discipline.
  */
 
 const jobs = [
@@ -313,7 +320,9 @@ const jobs = [
     confidential: true,
     location: 'Mumbai',
     region: 'Maharashtra',
-    sector: 'BFSI',
+    // Filed under Legal, not BFSI: the desk that runs this mandate is the
+    // legal desk, and one sector per role is the rule (see the header note).
+    sector: 'Legal',
     func: 'Legal & Claims',
     seniority: 'Mid-senior',
     type: 'Full-time',
@@ -360,6 +369,132 @@ const jobs = [
       'Comfortable writing specifications and running discovery interviews.',
     ],
     niceToHave: ['Seagoing background.', 'Experience with noon report or emissions data.'],
+  },
+
+  /* ------------------------------------------------------- Nevoxel Legal */
+  // Sample mandates for the legal desk, on the same placeholder footing as
+  // everything above: realistic, unattributed, not live vacancies.
+
+  {
+    slug: 'general-counsel-mumbai',
+    title: 'General Counsel',
+    company: 'Shipping and logistics group',
+    confidential: true,
+    location: 'Mumbai',
+    region: 'Maharashtra',
+    sector: 'Legal',
+    func: 'General Counsel',
+    seniority: 'Executive',
+    type: 'Full-time',
+    posted: '2026-08-18',
+    closes: '2026-10-18',
+    salary: { min: 7000000, max: 9500000, currency: 'INR', period: 'YEAR' },
+    summary:
+      'Build and lead the legal function for a group operating across shipping, freight forwarding and warehousing. First GC hire, reporting to the board.',
+    responsibilities: [
+      'Own legal strategy across the group and act as principal adviser to the board.',
+      'Build the in-house function from a standing start, including panel management and external counsel spend.',
+      'Lead on charterparty, terminal services and multimodal transport contracting.',
+      'Oversee regulatory compliance, corporate governance and board reporting.',
+    ],
+    requirements: [
+      'LLB with 12+ years post-qualification experience, including in-house time.',
+      'Commercial contracting depth in shipping, logistics or trade.',
+      'Experience advising a board directly, not through a general counsel.',
+    ],
+    niceToHave: [
+      'Prior first-legal-hire experience in a growing group.',
+      'Exposure to cross-border joint ventures.',
+    ],
+  },
+  {
+    slug: 'contracts-manager-navi-mumbai',
+    title: 'Contracts Manager',
+    company: 'Port and terminal operator',
+    confidential: true,
+    location: 'Navi Mumbai',
+    region: 'Maharashtra',
+    sector: 'Legal',
+    func: 'Contracts',
+    seniority: 'Mid-senior',
+    type: 'Full-time',
+    posted: '2026-08-06',
+    closes: '2026-10-06',
+    salary: { min: 2200000, max: 3000000, currency: 'INR', period: 'YEAR' },
+    summary:
+      'Draft and negotiate the commercial agreements a terminal runs on — concession, stevedoring, equipment and services contracts.',
+    responsibilities: [
+      'Draft, review and negotiate terminal services, stevedoring and equipment agreements.',
+      'Manage the contract lifecycle from tender through renewal, including variation control.',
+      'Advise operations on liability, indemnity and force majeure positions in live disputes.',
+      'Maintain the contract register and flag renewal and escalation dates.',
+    ],
+    requirements: [
+      'LLB or equivalent, with 6+ years in commercial contracting.',
+      'Hands-on drafting rather than review-only experience.',
+      'Comfortable negotiating opposite commercial teams without external counsel.',
+    ],
+    niceToHave: ['Port, terminal or infrastructure sector experience.', 'FIDIC familiarity.'],
+  },
+  {
+    slug: 'compliance-manager-gurugram',
+    title: 'Compliance Manager',
+    company: 'International freight forwarder',
+    confidential: true,
+    location: 'Gurugram',
+    region: 'Haryana',
+    sector: 'Legal',
+    func: 'Compliance',
+    seniority: 'Mid-senior',
+    type: 'Full-time',
+    posted: '2026-07-30',
+    closes: '2026-09-30',
+    summary:
+      'Own trade compliance, sanctions screening and anti-bribery controls for a forwarder moving cargo across sanctioned and high-risk lanes.',
+    responsibilities: [
+      'Run sanctions and denied-party screening, and own the escalation process for hits.',
+      'Maintain the anti-bribery and anti-corruption programme, including third-party due diligence.',
+      'Advise commercial teams on export controls and dual-use classification.',
+      'Prepare the compliance evidence for customer and regulator audits.',
+    ],
+    requirements: [
+      'Five or more years in trade, sanctions or financial-crime compliance.',
+      'Working knowledge of OFAC, EU and UN sanctions regimes.',
+      'Able to give a clear yes or no to a commercial team under time pressure.',
+    ],
+    niceToHave: ['Freight forwarding or customs brokerage background.', 'CAMS or equivalent.'],
+  },
+  {
+    slug: 'legal-operations-lead-bengaluru',
+    title: 'Legal Operations Lead',
+    company: 'Energy trading group',
+    confidential: true,
+    location: 'Bengaluru',
+    region: 'Karnataka',
+    sector: 'Legal',
+    func: 'Legal Operations',
+    seniority: 'Senior',
+    type: 'Full-time',
+    posted: '2026-07-22',
+    closes: '2026-09-22',
+    salary: { min: 3200000, max: 4200000, currency: 'INR', period: 'YEAR' },
+    summary:
+      'Bring process and data to a legal team that has outgrown its inbox. CLM rollout, panel spend and matter reporting.',
+    responsibilities: [
+      'Select and roll out a contract lifecycle management platform across three regions.',
+      'Build matter intake, triage and reporting so the team can show where its time goes.',
+      'Manage external counsel panel spend, billing guidelines and rate negotiation.',
+      'Design and maintain the legal team’s KPI reporting to the executive.',
+    ],
+    requirements: [
+      'Legal operations, legal project management or law firm PMO experience.',
+      'Delivered at least one CLM or matter management implementation end to end.',
+      'Fluent with data — you can build the report, not just request it.',
+    ],
+    niceToHave: [
+      'A legal qualification, though it is not required for this role.',
+      'Commodities or energy trading exposure.',
+    ],
   },
 ];
 

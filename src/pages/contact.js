@@ -21,10 +21,14 @@ module.exports = {
   priority: '0.8',
   render() {
     const hero = C.pageHero({
-      eyebrow: 'Contact',
-      coord: '3 offices',
       title: 'Talk to us',
       lede: 'One form, routed to the right desk. It replaces the seven separate addresses the old site scattered across its pages.',
+      image: {
+        src: '/assets/img/hero/contact.webp',
+        alt: 'Desk phone in use beside a notepad and pen in a small office',
+        width: 1536,
+        height: 1024,
+      },
     });
 
     const formBand = C.band({
@@ -33,7 +37,6 @@ module.exports = {
       body: `    <div class="split">
       <div>
         ${C.sectionHead({
-          eyebrow: 'Enquiry',
           title: 'Tell us which one you are',
           lede: 'The answer changes who reads this and what we ask you next. Nothing else about the form changes.',
         })}
@@ -52,7 +55,6 @@ module.exports = {
     const officesBand = C.band({
       tone: 'paper-alt',
       body: `    ${C.sectionHead({
-        eyebrow: 'Offices',
         title: 'Three offices across India',
       })}
     <div class="offices" data-motion="stagger">
@@ -75,7 +77,6 @@ module.exports = {
       tone: 'shoal',
       size: 'tight',
       body: `    ${C.sectionHead({
-        eyebrow: 'Direct',
         title: 'Prefer email?',
         lede: 'These are the only two addresses. Everything else routes into them.',
       })}
